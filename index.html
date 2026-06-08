@@ -1,41 +1,54 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Supplier Manager</title>
-    <!-- Fuentes modernas (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Boxicons para Iconografía -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>PROVEEDORES STREAM KGB</title>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Three.js para fondo 3D (Rabbit Hole) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         /* =========================================
-           VARIABLES CSS Y TEMAS (Claro / Oscuro)
+           VARIABLES J.A.R.V.I.S. / QUANTUM ESTHETIC
         ========================================= */
         :root {
-            --bg-body: #f4f7fe;
-            --bg-surface: #ffffff;
-            --text-main: #2b3674;
-            --text-muted: #a3aed1;
-            --border-color: #e2e8f0;
-            --primary: #4318ff;
-            --primary-hover: #3311db;
-            --success: #05cd99;
-            --danger: #ee5d50;
-            --warning: #ffce20;
-            --shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
-            --radius: 16px;
-            --transition: all 0.3s ease;
+            /* Colores Base Light (Gold/Holographic) */
+            --bg-body: transparent;
+            --bg-surface: rgba(255, 255, 255, 0.7);
+            --text-main: #1a1a2e;
+            --text-muted: #5c6280;
+            --border-color: rgba(212, 175, 55, 0.4); /* Dorado tenúe */
+            --primary: #d4af37; /* Dorado Stark */
+            --primary-glow: rgba(212, 175, 55, 0.5);
+            --secondary: #00e5ff;
+            --success: #00f5d4;
+            --danger: #ff3366;
+            --warning: #ffaa00;
+            --shadow: 0px 8px 32px rgba(212, 175, 55, 0.15);
+            --radius: 8px; /* Bordes más rectos, más tech */
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glass-blur: blur(16px);
         }
 
         [data-theme="dark"] {
-            --bg-body: #0b1437;
-            --bg-surface: #111c44;
-            --text-main: #ffffff;
-            --text-muted: #a3aed1;
-            --border-color: #1e293b;
-            --shadow: 0px 18px 40px rgba(0, 0, 0, 0.2);
+            /* Colores Base Dark (Iron Man/Sci-Fi) */
+            --bg-surface: rgba(4, 10, 24, 0.65); /* Azul noche ultra profundo */
+            --text-main: #e0f7fa; /* Blanco azulado */
+            --text-muted: #6482a5;
+            --border-color: rgba(0, 229, 255, 0.15);
+            --primary: #ff5500; /* Naranja HUD J.A.R.V.I.S */
+            --primary-glow: rgba(255, 85, 0, 0.6);
+            --secondary: #00e5ff; /* Cyan Holográfico */
+            --secondary-glow: rgba(0, 229, 255, 0.4);
+            --success: #00ffaa;
+            --danger: #ff003c;
+            --warning: #ffcc00;
+            --shadow: 0px 0px 20px rgba(0, 229, 255, 0.1);
         }
 
         * {
@@ -45,42 +58,78 @@
             font-family: 'Inter', sans-serif;
         }
 
+        h1, h2, h3, h4, h5, .logo, .platform-name, .adv-value, th {
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
         body {
-            background-color: var(--bg-body);
+            background-color: #020611; /* Fondo base muy oscuro */
             color: var(--text-main);
             display: flex;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: var(--transition);
+            /* Cuadrícula tecnológica de fondo */
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Lienzo 3D Rabbit Hole */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* =========================================
            SIDEBAR
         ========================================= */
         .sidebar {
-            width: 260px;
-            background-color: var(--bg-surface);
-            padding: 24px;
+            width: 250px;
+            background: var(--bg-surface);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 24px 20px;
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border-color);
+            box-shadow: inset -5px 0 20px rgba(0,0,0,0.2);
             transition: var(--transition);
             z-index: 100;
         }
 
         .logo {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
             margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .logo i {
-            font-size: 28px;
+        .logo-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+            text-shadow: 0 0 8px var(--secondary-glow);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
             color: var(--primary);
+            letter-spacing: 3px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
         }
 
         .nav-menu {
@@ -97,34 +146,59 @@
             padding: 12px 16px;
             color: var(--text-muted);
             text-decoration: none;
-            border-radius: 12px;
-            font-weight: 500;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 13px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
             transition: var(--transition);
+            position: relative;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid transparent;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 10%;
+            height: 80%;
+            width: 3px;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         .nav-item:hover, .nav-item.active {
-            background-color: rgba(67, 24, 255, 0.05);
+            background: rgba(255, 85, 0, 0.08); /* Fondo Naranja tenue */
+            border-color: rgba(255, 85, 0, 0.2);
             color: var(--primary);
+            text-shadow: 0 0 5px var(--primary-glow);
         }
 
-        .nav-item.active {
-            font-weight: 600;
-        }
+        .nav-item.active::before { transform: scaleY(1); }
 
         .theme-toggle {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 12px 16px;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: var(--radius);
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 12px;
+            font-family: 'Rajdhani', sans-serif;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
             transition: var(--transition);
         }
 
-        .theme-toggle:hover {
-            background-color: rgba(163, 174, 209, 0.1);
+        .theme-toggle:hover { 
+            border-color: var(--secondary);
+            color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary-glow);
         }
 
         /* =========================================
@@ -132,623 +206,282 @@
         ========================================= */
         .main-content {
             flex-grow: 1;
-            padding: 24px;
+            padding: 20px 30px;
             display: flex;
             flex-direction: column;
-            width: calc(100% - 260px);
+            width: calc(100% - 250px);
         }
 
         header {
+            /* STREAM KGB: Header Holográfico */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background-color: var(--bg-surface);
+            margin-bottom: 24px;
+            background: linear-gradient(90deg, rgba(4,10,24,0.8) 0%, rgba(0,229,255,0.05) 100%);
+            backdrop-filter: var(--glass-blur);
             padding: 12px 24px;
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--secondary);
         }
 
         .search-bar {
             display: flex;
             align-items: center;
-            background-color: var(--bg-body);
-            padding: 10px 20px;
-            border-radius: 30px;
-            width: 350px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 4px;
+            width: 400px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%); /* Corte diagonal Cyberpunk */
         }
 
-        .search-bar i {
-            color: var(--text-main);
-            font-size: 18px;
-            margin-right: 10px;
+        .search-bar:focus-within {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px var(--secondary-glow);
+            background: rgba(0, 229, 255, 0.05);
         }
 
+        .search-bar i { color: var(--secondary); font-size: 18px; margin-right: 10px; }
         .search-bar input {
-            border: none;
-            background: none;
-            outline: none;
-            color: var(--text-main);
-            width: 100%;
-            font-size: 14px;
-            text-transform: uppercase;
+            border: none; background: none; outline: none; color: var(--text-main); width: 100%;
+            font-size: 13px; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;
         }
 
-        .header-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .header-profile { 
+            display: flex; align-items: center; gap: 15px; 
+            background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 30px; border: 1px solid rgba(255,85,0,0.3);
         }
-
+        .header-profile span {
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--primary); font-size: 14px; letter-spacing: 1px;
+        }
         .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #000;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;
+            box-shadow: 0 0 10px var(--primary-glow); border: 2px solid #000;
         }
-
-        .mobile-menu-btn {
-            display: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-main);
-        }
+        .mobile-menu-btn { display: none; font-size: 20px; cursor: pointer; color: var(--secondary); }
 
         /* =========================================
-           ESTADÍSTICAS GLOBALES
+           TARJETAS Y PANELES (Glassmorphism)
         ========================================= */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .glass-panel {
+            background: var(--bg-surface);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Adorno esquina tech */
+        .glass-panel::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 20px;
+            border-top: 2px solid var(--secondary); border-right: 2px solid var(--secondary);
+            opacity: 0.5;
         }
 
-        .stat-card {
-            background-color: var(--bg-surface);
-            padding: 20px;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: var(--shadow);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card { 
+            padding: 16px 20px; display: flex; align-items: center; gap: 15px; transition: var(--transition); 
+            border-left: 3px solid transparent;
+        }
+        .stat-card:hover { 
+            transform: translateY(-2px); 
+            background: rgba(0, 229, 255, 0.05);
+            border-left-color: var(--secondary);
         }
 
         .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
         }
+        .icon-blue { color: var(--secondary); text-shadow: 0 0 10px var(--secondary-glow); }
+        .icon-green { color: var(--success); text-shadow: 0 0 10px rgba(0,255,170,0.5); }
+        .icon-orange { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        .icon-red { color: var(--danger); text-shadow: 0 0 10px rgba(255,0,60,0.5); }
 
-        .icon-blue { background: rgba(67, 24, 255, 0.1); color: var(--primary); }
-        .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
-        .icon-orange { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
-        .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
+        .stat-info h4 { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+        .stat-info h2 { font-size: 22px; font-weight: 700; color: #fff; font-family: 'Share Tech Mono', monospace; }
 
-        .stat-info h4 {
-            font-size: 14px;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .stat-info h2 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        /* =========================================
-           DASHBOARD GRID (Tarjetas & Top)
-        ========================================= */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 24px;
         }
 
         .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+            color: var(--text-main); letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;
+        }
+        .section-title i { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+
+        .platform-card { 
+            padding: 14px; transition: var(--transition); border: 1px solid rgba(0,229,255,0.2); 
+            background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(4,10,24,0.8) 100%);
+        }
+        
+        .platform-card:hover { 
+            border-color: var(--secondary); box-shadow: 0 0 15px var(--secondary-glow);
+            transform: scale(1.02);
         }
 
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-        }
-
-        .platform-card {
-            background-color: var(--bg-surface);
-            padding: 16px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            position: relative;
-        }
-
-        .platform-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .platform-name {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .platform-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .platform-details p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .platform-details span {
-            color: var(--text-main);
-            font-weight: 500;
-        }
+        .platform-name { font-size: 16px; color: #fff; letter-spacing: 1px;}
+        .platform-price { font-size: 20px; font-family: 'Share Tech Mono', monospace; color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+        .platform-details { margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; }
+        .platform-details p { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; font-family: 'Rajdhani', sans-serif;}
+        .platform-details span { color: var(--secondary); font-weight: 600; }
 
         .best-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: var(--warning);
-            color: #000;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: absolute; top: 0; right: 0; background: var(--primary); color: #000;
+            font-size: 9px; font-weight: 700; padding: 4px 8px; border-bottom-left-radius: 8px;
+            font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
         }
 
-        .top-panel {
-            background-color: var(--bg-surface);
-            padding: 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .top-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
+        .top-panel { padding: 16px 20px; }
+        .top-list { display: flex; flex-direction: column; gap: 8px; }
         .top-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px;
-            border-radius: 12px;
-            background-color: var(--bg-body);
+            padding: 10px; border-radius: 4px; background: rgba(0,0,0,0.4);
+            border-left: 2px solid transparent; transition: var(--transition); display: flex; align-items: center; gap: 12px;
         }
+        .top-item:hover { border-left-color: var(--success); background: rgba(0,255,170,0.05); transform: translateX(4px); }
 
         .top-rank {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 14px;
+            width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #000; font-size: 12px; font-family: 'Share Tech Mono', monospace;
         }
-
-        .rank-1 { background-color: #FFD700; }
-        .rank-2 { background-color: #C0C0C0; }
-        .rank-3 { background-color: #CD7F32; }
-
-        .top-info h4 { font-size: 14px; margin-bottom: 4px; }
-        .top-info p { font-size: 12px; color: var(--text-muted); }
+        .rank-1 { background-color: var(--primary); box-shadow: 0 0 8px var(--primary-glow);} 
+        .rank-2 { background-color: #a0aec0; } 
+        .rank-3 { background-color: #b45309; }
 
         /* =========================================
-           TABLA DETALLADA
+           FILTROS Y TABLA PRINCIPAL
         ========================================= */
-        .table-section {
-            background-color: var(--bg-surface);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        .platform-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-btn {
+            background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid rgba(0,229,255,0.2);
+            padding: 6px 14px; cursor: pointer; font-size: 11px; font-family: 'Share Tech Mono', monospace;
+            transition: var(--transition); clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); /* Diseño Hexagonal */
         }
+        .filter-btn:hover { color: var(--secondary); border-color: var(--secondary); }
+        .filter-btn.active { background: rgba(0,229,255,0.15); color: var(--secondary); border-color: var(--secondary); text-shadow: 0 0 5px var(--secondary); }
 
-        .table-header-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
+        .table-section { padding: 20px; margin-bottom: 24px; }
+        .table-header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        
         .sort-control select {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            outline: none;
-            font-size: 14px;
+            padding: 6px 12px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.6);
+            color: var(--secondary); outline: none; font-family: 'Share Tech Mono', monospace; font-size: 11px;
+            cursor: pointer;
         }
 
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
         th {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 13px;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
+            color: var(--text-muted); font-size: 11px; padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;
+            background: rgba(0,0,0,0.3);
         }
-
-        td {
-            padding: 16px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-weight: 500;
+        td { 
+            padding: 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            color: #d1d5db; font-family: 'Rajdhani', sans-serif; font-weight: 500;
         }
+        tbody tr { transition: background 0.2s; }
+        tbody tr:hover { background: rgba(0, 229, 255, 0.05); }
 
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
-        .badge-warning { background-color: rgba(255, 206, 32, 0.1); color: var(--warning); }
-        .badge-danger { background-color: rgba(238, 93, 80, 0.1); color: var(--danger); }
+        .badge { padding: 3px 8px; font-size: 9px; font-family: 'Share Tech Mono', monospace; border: 1px solid; }
 
         /* =========================================
-           VISTAS DINÁMICAS (Navegación SPA)
+           FORMULARIOS STARK HUD
         ========================================= */
-        .view-section {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .view-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* =========================================
-           FORMULARIOS (Proveedores)
-        ========================================= */
-        .form-card {
-            background-color: var(--bg-surface);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            max-width: 800px;
-            margin-top: 20px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
+        .form-card { padding: 20px; max-width: 800px; margin-top: 16px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--secondary); font-size: 11px; font-family: 'Share Tech Mono', monospace; }
         .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            outline: none;
-            transition: var(--transition);
-            text-transform: uppercase;
+            width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.8);
+            color: #fff; outline: none; transition: var(--transition); font-family: 'Share Tech Mono', monospace; font-size: 13px;
         }
+        .form-group input:focus { border-color: var(--primary); box-shadow: inset 0 0 10px rgba(255,85,0,0.2); }
 
-        .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 24, 255, 0.1);
+        .btn-primary, .btn-outline, .btn-danger {
+            padding: 8px 18px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 12px; transition: var(--transition);
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
         }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-        
-        .btn-primary:disabled {
-            background-color: var(--text-muted);
-            cursor: not-allowed;
-        }
+        .btn-primary { background: rgba(255,85,0,0.1); color: var(--primary); border: 1px solid var(--primary); }
+        .btn-primary:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary-glow); }
+        .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); }
+        .btn-outline:hover { color: #fff; border-color: #fff; }
+        .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #000; box-shadow: 0 0 15px rgba(255,0,60,0.5);}
 
         /* =========================================
-           ESTADÍSTICAS AVANZADAS
+           SISTEMA DE NOTIFICACIONES
         ========================================= */
-        .advanced-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            min-width: 250px; padding: 12px 16px; background: rgba(4, 10, 24, 0.95); border: 1px solid; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.8); color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 12px; 
+            display: flex; align-items: center; gap: 10px; animation: slideInRight 0.3s ease; cursor: pointer;
         }
+        .toast.success { border-color: var(--success); box-shadow: inset 0 0 10px rgba(0,255,170,0.2); }
+        .toast.error { border-color: var(--danger); }
+        .toast.info { border-color: var(--secondary); }
+        .toast i { font-size: 18px; }
 
-        .adv-card {
-            background-color: var(--bg-surface);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeOut { to { opacity: 0; transform: scale(0.9); } }
 
-        .adv-card h3 {
-            font-size: 15px;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
+        .view-section { display: none; animation: viewFadeIn 0.3s ease forwards; opacity: 0; }
+        .view-section.active { display: block; }
+        @keyframes viewFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .adv-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .adv-card p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .bars-container, .list-container { margin-top: 20px; }
-
-        .bar-item { margin-bottom: 16px; }
-
-        .bar-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .bar-track {
-            width: 100%;
-            height: 10px;
-            background-color: var(--bg-body);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background-color: var(--primary);
-            border-radius: 5px;
-            transition: width 0.5s ease-in-out;
-        }
-
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .list-item:last-child { border-bottom: none; }
-
-        /* =========================================
-           AJUSTES
-        ========================================= */
-        .settings-container {
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .settings-card {
-            background-color: var(--bg-surface);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .settings-card h3 {
-            font-size: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-main);
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .setting-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .setting-info h4 {
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: var(--text-main);
-        }
-
-        .setting-info p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.online { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
-        .status-badge.online::before { content: ''; width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
-        
-        .status-badge.status-warning { background-color: rgba(255, 206, 32, 0.1); color: var(--warning); }
-        .status-badge.status-warning::before { content: ''; width: 8px; height: 8px; background: var(--warning); border-radius: 50%; }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-outline:hover { background: var(--bg-body); }
-        
-        .btn-google { border-color: #4285F4; color: #4285F4; }
-        .btn-google:hover { background: rgba(66, 133, 244, 0.1); }
-        .btn-google.connected { background: #4285F4; color: white; border-color: #4285F4; }
-        .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
-        
-        .btn-danger {
-            background-color: rgba(238, 93, 80, 0.1);
-            color: var(--danger);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: var(--transition);
-        }
-
-        .btn-danger:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        /* =========================================
-           RESPONSIVE DESIGN
-        ========================================= */
-        @media (max-width: 1024px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .form-grid { grid-template-columns: 1fr; }
-            .setting-item { flex-direction: column; align-items: flex-start; gap: 12px; }
-        }
-
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -260px;
-                height: 100vh;
-                box-shadow: var(--shadow);
-            }
+            .sidebar { position: fixed; left: -250px; height: 100vh; }
             .sidebar.active { left: 0; }
             .main-content { width: 100%; }
             .mobile-menu-btn { display: block; }
-            .search-bar { width: auto; flex-grow: 1; margin: 0 15px; }
+            .search-bar { width: auto; flex-grow: 1; margin: 0 10px; }
             .header-profile span { display: none; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Fondo 3D Interactivo (Rabbit Hole) -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Notificaciones -->
+    <div id="toast-container"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="logo">
-            <i class='bx bxs-carousel'></i>
-            <span>StreamMgr</span>
+            <div class="logo-title">STREAM_KGB</div>
+            <div class="logo-subtitle">NEXUS DB V.2.0</div>
         </div>
         <nav class="nav-menu">
-            <a href="#" class="nav-item active" data-target="view-dashboard"><i class='bx bxs-dashboard'></i> Dashboard</a>
-            <a href="#" class="nav-item" data-target="view-proveedores"><i class='bx bx-list-ul'></i> Proveedores</a>
-            <a href="#" class="nav-item" data-target="view-estadisticas"><i class='bx bx-chart'></i> Estadísticas</a>
-            <a href="#" class="nav-item" data-target="view-ajustes"><i class='bx bx-cog'></i> Ajustes</a>
+            <a href="#" class="nav-item active" data-target="view-dashboard"><i class='bx bx-grid-alt'></i> DB GLOBAL</a>
+            <a href="#" class="nav-item" data-target="view-proveedores"><i class='bx bx-data'></i> NODOS PROVEEDORES</a>
+            <a href="#" class="nav-item" data-target="view-estadisticas"><i class='bx bx-radar'></i> RADAR ANALÍTICO</a>
+            <a href="#" class="nav-item" data-target="view-ajustes"><i class='bx bx-slider-alt'></i> MATRIZ DE AJUSTES</a>
         </nav>
-        <div class="theme-toggle" id="theme-toggle">
-            <i class='bx bx-moon'></i>
-            <span>Modo Oscuro</span>
+        <div class="theme-toggle" id="theme-toggle" style="margin-top: auto;">
+            <i class='bx bx-sun'></i>
+            <span>MODO ÓPTICO</span>
         </div>
     </aside>
 
@@ -758,135 +491,126 @@
         <header>
             <i class='bx bx-menu mobile-menu-btn' id="mobile-menu-btn"></i>
             <div class="search-bar">
-                <i class='bx bx-search'></i>
-                <input type="text" id="global-search" placeholder="BUSCAR PLATAFORMA, PÁGINA O PROVEEDOR...">
+                <i class='bx bx-search-alt-2'></i>
+                <input type="text" id="global-search" placeholder="ESCANEAR PLATAFORMA O PROVEEDOR...">
             </div>
             <div class="header-profile">
-                <div class="avatar">A</div>
+                <span>JoséVIZ</span>
+                <div class="avatar"><i class='bx bxs-user'></i></div>
             </div>
         </header>
 
-        <!-- CONTENEDOR DE VISTAS -->
-        
-        <!-- VISTA 1: DASHBOARD (Principal) -->
+        <!-- VISTA 1: DASHBOARD -->
         <div id="view-dashboard" class="view-section active">
-            <!-- ESTADÍSTICAS -->
-            <div class="stats-grid" id="stats-container">
-                <!-- Renderizado dinámico -->
-            </div>
+            
+            <!-- ESTADÍSTICAS GLOBALES -->
+            <div class="stats-grid" id="stats-container"></div>
 
-            <!-- DASHBOARD GRID -->
-            <div class="dashboard-grid">
-                <!-- Tarjetas de Plataformas -->
-                <div class="cards-section">
-                    <h2 class="section-title"><i class='bx bxs-discount'></i> Mejores Precios por Plataforma</h2>
-                    <div class="cards-container" id="platform-cards">
-                        <!-- Renderizado dinámico -->
-                    </div>
-                </div>
-
-                <!-- Top Proveedores -->
-                <div class="top-panel">
-                    <h2 class="section-title"><i class='bx bxs-trophy'></i> Top Proveedores</h2>
-                    <div class="top-list" id="top-providers">
-                        <!-- Renderizado dinámico -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLA DETALLADA -->
-            <div class="table-section">
+            <!-- TABLA DETALLADA (ARRIBA) -->
+            <div class="table-section glass-panel">
                 <div class="table-header-controls">
-                    <h2 class="section-title"><i class='bx bx-table'></i> Catálogo Detallado</h2>
+                    <h2 class="section-title"><i class='bx bx-server'></i> CATÁLOGO GLOBAL</h2>
                     <div class="sort-control">
-                        <label for="sort-select" style="font-size: 14px; color: var(--text-muted); margin-right: 8px;">Ordenar por:</label>
                         <select id="sort-select">
-                            <option value="price-asc">Menor precio</option>
-                            <option value="licenses-desc">Mayor cantidad licencias</option>
-                            <option value="updated-desc">Actualización reciente</option>
-                            <option value="platform-asc">Plataforma (A-Z)</option>
-                            <option value="provider-asc">Proveedor (A-Z)</option>
+                            <option value="price-asc">ORDEN: MENOR PRECIO</option>
+                            <option value="licenses-desc">ORDEN: MAYOR STOCK</option>
+                            <option value="updated-desc">ORDEN: MÁS RECIENTE</option>
+                            <option value="platform-asc">ORDEN: ALFABÉTICO (A-Z)</option>
                         </select>
                     </div>
                 </div>
+                
+                <!-- Filtros Rápidos (Píldoras tech) -->
+                <div class="platform-filters" id="platform-filters"></div>
                 
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Plataforma</th>
-                                <th>Página</th>
-                                <th>Proveedor</th>
-                                <th>Precio</th>
-                                <th>Licencias</th>
-                                <th>Actualización</th>
+                                <th>Enlace Web</th>
+                                <th>Entidad</th>
+                                <th>Costo (S/)</th>
+                                <th>Stock</th>
+                                <th>Sincronización</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body">
-                            <!-- Renderizado dinámico -->
-                        </tbody>
+                        <tbody id="table-body"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- DASHBOARD GRID (ABAJO) -->
+            <div class="dashboard-grid">
+                <!-- Tarjetas -->
+                <div class="cards-section glass-panel" style="padding: 16px;">
+                    <h2 class="section-title"><i class='bx bx-target-lock'></i> Detección Óptima</h2>
+                    <div class="cards-container" id="platform-cards"></div>
+                </div>
+                <!-- Top -->
+                <div class="top-panel glass-panel">
+                    <h2 class="section-title"><i class='bx bx-crown'></i> Nodos Eficientes</h2>
+                    <div class="top-list" id="top-providers"></div>
                 </div>
             </div>
         </div>
 
         <!-- VISTA 2: PROVEEDORES -->
         <div id="view-proveedores" class="view-section">
-            <h2 class="section-title"><i class='bx bx-store-alt'></i> Gestión de Proveedores</h2>
+            <h2 class="section-title"><i class='bx bx-network-chart'></i> GESTIÓN DE NODOS</h2>
             
-            <div class="form-card">
-                <h3 style="margin-bottom: 20px; font-size: 16px;">Agregar Nuevo Registro</h3>
+            <!-- Formulario HUD Stark -->
+            <div class="form-card glass-panel">
+                <h3 style="margin-bottom: 16px; font-size: 14px; color:var(--secondary); font-family: 'Share Tech Mono';">/ INICIALIZAR_NUEVO_REGISTRO</h3>
                 <form id="add-provider-form">
-                    <div class="form-grid">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-group">
-                            <label for="p-platform">Plataforma</label>
+                            <label>Plataforma</label>
                             <input type="text" id="p-platform" required placeholder="EJ. NETFLIX">
                         </div>
                         <div class="form-group">
-                            <label for="p-website">Página Web</label>
+                            <label>Página Web</label>
                             <input type="text" id="p-website" required placeholder="EJ. FLUX">
                         </div>
-                        <div class="form-group full-width">
-                            <label for="p-provider">Nombre del Proveedor</label>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Identidad del Proveedor</label>
                             <input type="text" id="p-provider" required placeholder="EJ. CARLOS">
                         </div>
                         <div class="form-group">
-                            <label for="p-price">Precio (S/)</label>
+                            <label>Costo (S/)</label>
                             <input type="number" id="p-price" required min="0" step="0.01" placeholder="EJ. 8.50">
                         </div>
                         <div class="form-group">
-                            <label for="p-licenses">Cantidad de Licencias</label>
+                            <label>Volumen Licencias</label>
                             <input type="number" id="p-licenses" required min="0" placeholder="EJ. 20">
                         </div>
                     </div>
-                    <div id="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
-                        <button type="button" id="btn-cancel-edit" class="btn-outline" style="display: none;"><i class='bx bx-x'></i> Cancelar</button>
-                        <button type="submit" id="btn-submit-form" class="btn-primary"><i class='bx bx-cloud-upload'></i> Guardar Registro</button>
+                    <div id="form-actions" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" id="btn-cancel-edit" class="btn-outline" style="display: none;">ABORTAR</button>
+                        <button type="submit" id="btn-submit-form" class="btn-primary">TRANSMITIR</button>
                     </div>
                 </form>
             </div>
             
-            <!-- HISTORIAL DE GESTIÓN -->
-            <div class="table-section" style="margin-top: 24px;">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 16px;">
-                    <i class='bx bx-history'></i> Historial de Registros
+            <!-- Historial -->
+            <div class="table-section glass-panel" style="margin-top: 20px;">
+                <div class="section-title" style="font-size: 14px; margin-bottom: 12px;">
+                    <i class='bx bx-history'></i> REGISTRO_OPERACIONES_LOCALES
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>Hash ID</th>
                                 <th>Plataforma</th>
                                 <th>Proveedor</th>
-                                <th>Precio</th>
-                                <th>Licencias</th>
-                                <th>Acciones</th>
+                                <th>Valor</th>
+                                <th>Stock</th>
+                                <th>Comandos</th>
                             </tr>
                         </thead>
-                        <tbody id="management-table-body">
-                            <!-- Renderizado dinámico -->
-                        </tbody>
+                        <tbody id="management-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -894,83 +618,73 @@
 
         <!-- VISTA 3: ESTADÍSTICAS -->
         <div id="view-estadisticas" class="view-section">
-            <h2 class="section-title"><i class='bx bx-line-chart'></i> Estadísticas Avanzadas</h2>
+            <h2 class="section-title"><i class='bx bx-radar'></i> TELEMETRÍA AVANZADA</h2>
             
-            <div class="advanced-grid">
-                <div class="adv-card">
-                    <h3>Valor Total del Inventario</h3>
-                    <div class="adv-value" id="adv-total-value">S/ 0.00</div>
-                    <p>Capital estimado (Precio × Licencias de todo el stock)</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="color:var(--secondary); font-size:11px; font-family:'Share Tech Mono';">/ VALORIZACIÓN_INVENTARIO</h3>
+                    <div class="adv-value" id="adv-total-value" style="font-size:28px; color:var(--success); margin: 6px 0;">S/ 0.00</div>
+                    <p style="font-size:11px; color:var(--text-muted);">Proyección de liquidez total.</p>
                 </div>
-                <div class="adv-card">
-                    <h3>Precio Promedio General</h3>
-                    <div class="adv-value" id="adv-avg-price">S/ 0.00</div>
-                    <p>Media aritmética entre todos los proveedores</p>
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="color:var(--secondary); font-size:11px; font-family:'Share Tech Mono';">/ MEDIANA_COSTES_GLOBAL</h3>
+                    <div class="adv-value" id="adv-avg-price" style="font-size:28px; color:var(--primary); margin: 6px 0;">S/ 0.00</div>
+                    <p style="font-size:11px; color:var(--text-muted);">Algoritmo de media aritmética.</p>
                 </div>
             </div>
 
-            <div class="advanced-grid">
-                <div class="adv-card">
-                    <h3>Licencias por Plataforma (Stock)</h3>
-                    <div id="adv-licenses-bars" class="bars-container">
-                        <!-- Barras generadas por JS -->
-                    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="margin-bottom: 16px; font-family:'Rajdhani'; font-size:14px; color: #fff;">DISTRIBUCIÓN DE NODOS</h3>
+                    <div id="adv-licenses-bars"></div>
                 </div>
-                <div class="adv-card">
-                    <h3>Precio Promedio por Plataforma</h3>
-                    <div id="adv-prices-list" class="list-container">
-                        <!-- Lista generada por JS -->
-                    </div>
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="margin-bottom: 16px; font-family:'Rajdhani'; font-size:14px; color: #fff;">FLUCTUACIÓN DE PRECIOS</h3>
+                    <div id="adv-prices-list"></div>
                 </div>
             </div>
         </div>
 
         <!-- VISTA 4: AJUSTES -->
         <div id="view-ajustes" class="view-section">
-            <h2 class="section-title"><i class='bx bx-cog'></i> Configuración del Sistema</h2>
+            <h2 class="section-title"><i class='bx bx-slider-alt'></i> MATRIZ DE CONFIGURACIÓN</h2>
             
-            <div class="settings-container">
-                <!-- Integraciones -->
-                <div class="settings-card">
-                    <h3><i class='bx bx-plug'></i> Integraciones y Conexiones</h3>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>Base de Datos Principal</h4>
-                            <p>Estado de la conexión local/servidor.</p>
+            <div style="max-width: 700px; display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="font-family:'Share Tech Mono'; font-size:13px; margin-bottom: 12px; color:var(--secondary);">/ CONEXIONES_EXTERNAS</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div>
+                            <h4 style="font-family:'Rajdhani'; font-size:13px;">ENLACE DEL SERVIDOR</h4>
+                            <p style="font-size:10px; color:var(--text-muted);">Estado del túnel de datos.</p>
                         </div>
-                        <div class="status-badge status-warning" id="db-status-badge">Conectando...</div>
+                        <div id="db-status-badge" style="background:rgba(255,204,0,0.1); color:var(--warning); padding:4px 8px; border:1px solid; font-size:10px; font-family:'Share Tech Mono';">SONDEANDO...</div>
                     </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>Sincronización con Google Sheets</h4>
-                            <p>Guarda todos los datos locales actuales hacia tu Google Sheet en la nube.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0;">
+                        <div>
+                            <h4 style="font-family:'Rajdhani'; font-size:13px;">SINCRONIZACIÓN CLOUD</h4>
+                            <p style="font-size:10px; color:var(--text-muted);">Fuerza un volcado a Google Sheets.</p>
                         </div>
-                        <button id="btn-sync-sheets" class="btn-outline btn-google">
-                            <i class='bx bxl-google'></i> Sincronizar a Sheets
+                        <button id="btn-sync-sheets" class="btn-primary" style="background:transparent; color:#00e5ff; border-color:#00e5ff;">
+                            <i class='bx bx-sync'></i> SINCRONIZAR
                         </button>
                     </div>
                 </div>
 
-                <!-- Gestión de Datos -->
-                <div class="settings-card">
-                    <h3><i class='bx bx-data'></i> Gestión de Datos</h3>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>Exportar Inventario</h4>
-                            <p>Descarga una copia de seguridad en formato JSON de todos los proveedores.</p>
+                <div class="glass-panel" style="padding: 20px;">
+                    <h3 style="font-family:'Share Tech Mono'; font-size:13px; margin-bottom: 12px; color:var(--danger);">/ CONTROL_DE_MEMORIA</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div>
+                            <h4 style="font-family:'Rajdhani'; font-size:13px;">EXTRACCIÓN DE DATOS</h4>
+                            <p style="font-size:10px; color:var(--text-muted);">Descarga el JSON de la matriz actual.</p>
                         </div>
-                        <button id="btn-export-data" class="btn-outline">
-                            <i class='bx bx-download'></i> Descargar Backup
-                        </button>
+                        <button id="btn-export-data" class="btn-outline">BACKUP LOCAL</button>
                     </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>Limpiar Base de Datos Local</h4>
-                            <p>Borra todos los registros actuales de esta vista. (No borra tu Google Sheet).</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 0;">
+                        <div>
+                            <h4 style="font-family:'Rajdhani'; font-size:13px;">PURGA DE SUBSISTEMA</h4>
+                            <p style="font-size:10px; color:var(--text-muted);">Limpia el caché visual.</p>
                         </div>
-                        <button id="btn-clear-data" class="btn-danger">
-                            <i class='bx bx-trash'></i> Eliminar Todo
-                        </button>
+                        <button id="btn-clear-data" class="btn-danger">PURGAR VISUAL</button>
                     </div>
                 </div>
             </div>
@@ -978,82 +692,177 @@
 
     </main>
 
-    <!-- SCRIPTS DE LA APLICACIÓN -->
     <script>
         // =========================================
-        // NUEVA URL DE TU API DE GOOGLE APPS SCRIPT
+        // MOTOR DE NOTIFICACIONES TOAST (Sci-Fi)
+        // =========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'bx-info-square';
+            if (type === 'success') icon = 'bx-check-square';
+            if (type === 'error') icon = 'bx-x-square';
+
+            toast.innerHTML = `<i class='bx ${icon}'></i> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            toast.addEventListener('click', () => removeToast(toast));
+            setTimeout(() => removeToast(toast), 3000);
+        }
+
+        function removeToast(toast) {
+            toast.style.animation = 'fadeOut 0.2s forwards';
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 200);
+        }
+
+        // =========================================
+        // RABBIT HOLE 3D (Efecto Cuántico / Túnel)
+        // =========================================
+        let scene, camera, renderer, particleSystem;
+        function init3DBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            scene = new THREE.Scene();
+            
+            // Cámara enfocando hacia adentro del túnel
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 1000;
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Crear el vórtice
+            const particleCount = 2000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const color1 = new THREE.Color(isDark ? 0x00e5ff : 0xd4af37); // Cyan o Dorado
+            const color2 = new THREE.Color(isDark ? 0xff5500 : 0x1a1a2e); // Naranja HUD o Dark Blue
+
+            for (let i = 0; i < particleCount; i++) {
+                // Matemáticas cilíndricas para el "Rabbit Hole"
+                const theta = Math.random() * Math.PI * 2;
+                const radius = 200 + Math.random() * 500; // Radio del túnel
+                const z = (Math.random() - 0.5) * 3000; // Profundidad del túnel
+
+                positions[i * 3] = Math.cos(theta) * radius;
+                positions[i * 3 + 1] = Math.sin(theta) * radius;
+                positions[i * 3 + 2] = z;
+
+                // Mezclar colores para dar profundidad
+                const mixedColor = color1.clone().lerp(color2, Math.random());
+                colors[i * 3] = mixedColor.r;
+                colors[i * 3 + 1] = mixedColor.g;
+                colors[i * 3 + 2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 2.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending
+            });
+
+            particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+
+            animateRabbitHole();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function animateRabbitHole() {
+            requestAnimationFrame(animateRabbitHole);
+            
+            // Rotación del túnel
+            particleSystem.rotation.z -= 0.001;
+            
+            // Movimiento hacia adelante (Efecto de caída)
+            const positions = particleSystem.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 2] += 5; // Velocidad de caída
+                if (positions[i + 2] > 1500) {
+                    positions[i + 2] = -1500; // Resetear al fondo cuando pasa la cámara
+                }
+            }
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        // =========================================
+        // CORE DEL SISTEMA Y FETCH DE DATOS
         // =========================================
         const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzy3kVcs918Xr5YLjBfgMGCCiX_IJ3wYO9omHR6VIPDz-Va0ovadQUaKJBpBlEn-Ag0Dg/exec";
 
-        // Datos de ejemplo como respaldo (por si Sheets está vacío o falla la conexión inicial)
-        const MOCK_JSON_DATA = [
-            { "id": "1", "platform": "NETFLIX", "website": "FLUX", "provider": "CARLOS", "price": 8, "licenses": 20, "updated": "2026-06-07T19:55:00Z" }
-        ];
-
-        // Estado Global
         let suppliersData = [];
         let currentData = [];
-        let editingId = null; // Controla si estamos agregando o editando un registro
+        let editingId = null; 
+        let activePlatformFilter = 'ALL';
 
-        // Elementos DOM
         const tableBody = document.getElementById('table-body');
-        const platformCards = document.getElementById('platform-cards');
-        const topProviders = document.getElementById('top-providers');
-        const statsContainer = document.getElementById('stats-container');
         const searchInput = document.getElementById('global-search');
         const sortSelect = document.getElementById('sort-select');
-        const themeToggle = document.getElementById('theme-toggle');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
-        const navItems = document.querySelectorAll('.nav-item');
         const viewSections = document.querySelectorAll('.view-section');
+        const navItems = document.querySelectorAll('.nav-item');
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            loadData();
+            init3DBackground();
             setupEvents();
-            initTheme();
+            loadData();
         });
 
-        // 1. CARGA DE DATOS DESDE GOOGLE SHEETS
         async function loadData() {
             try {
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Conectando con Google Sheets... <i class='bx bx-loader-alt bx-spin'></i></td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--secondary);">INICIALIZANDO ENLACE CUÁNTICO...</td></tr>`;
 
                 const response = await fetch(GOOGLE_SHEETS_API_URL);
                 const data = await response.json();
                 
-                if (data && data.length > 0) {
-                    suppliersData = data; 
-                } else {
-                    suppliersData = MOCK_JSON_DATA; 
-                }
+                if (data && data.length > 0) suppliersData = data; 
                 
                 currentData = [...suppliersData];
                 renderDashboard();
                 
                 const dbBadge = document.getElementById('db-status-badge');
                 if(dbBadge) {
-                    dbBadge.className = 'status-badge online';
-                    dbBadge.innerHTML = "<i class='bx bx-cloud'></i> Conectado a Sheets";
+                    dbBadge.style.background = 'rgba(0, 255, 170, 0.1)';
+                    dbBadge.style.color = 'var(--success)';
+                    dbBadge.style.borderColor = 'var(--success)';
+                    dbBadge.innerHTML = "ENLACE_ESTABLE";
                 }
+                showToast("Conexión con NEXUS DB establecida.", "success");
 
             } catch (error) {
-                console.error("Error al cargar datos:", error);
-                suppliersData = MOCK_JSON_DATA;
-                currentData = [...suppliersData];
-                renderDashboard();
+                console.error("Error:", error);
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger);">ERROR DE CONEXIÓN. MODO OFFLINE.</td></tr>`;
                 
                 const dbBadge = document.getElementById('db-status-badge');
                 if(dbBadge) {
-                    dbBadge.className = 'status-badge status-warning';
-                    dbBadge.innerHTML = "Modo Local (Offline)";
+                    dbBadge.style.background = 'rgba(255, 0, 60, 0.1)';
+                    dbBadge.style.color = 'var(--danger)';
+                    dbBadge.style.borderColor = 'var(--danger)';
+                    dbBadge.innerHTML = "FALLA_DE_ENLACE";
                 }
+                showToast("NEXUS DB Inalcanzable.", "error");
             }
         }
 
+        // =========================================
+        // EVENTOS DE INTERFAZ (HUD)
+        // =========================================
         function setupEvents() {
-            // Mayúsculas automáticas
             document.addEventListener('input', (e) => {
                 if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
                     const start = e.target.selectionStart;
@@ -1065,17 +874,11 @@
 
             searchInput.addEventListener('input', handleSearch);
             sortSelect.addEventListener('change', handleSort);
-            mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
             
-            themeToggle.addEventListener('click', () => {
-                const html = document.documentElement;
-                const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateThemeIcon(newTheme);
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('active');
             });
-
-            // Navegación SPA
+            
             navItems.forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1085,13 +888,11 @@
                     const targetId = item.getAttribute('data-target');
                     const targetView = document.getElementById(targetId);
                     if (targetView) targetView.classList.add('active');
-                    if (window.innerWidth <= 768) sidebar.classList.remove('active');
+                    if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
                 });
             });
 
-            // ==========================================
-            // 2. ENVIAR O EDITAR PROVEEDOR (NUBE)
-            // ==========================================
+            // LOGICA FORMULARIO
             const addProviderForm = document.getElementById('add-provider-form');
             const btnCancelEdit = document.getElementById('btn-cancel-edit');
             const btnSubmitForm = document.getElementById('btn-submit-form');
@@ -1100,8 +901,8 @@
                 btnCancelEdit.addEventListener('click', () => {
                     editingId = null;
                     addProviderForm.reset();
-                    document.querySelector('.form-card h3').innerHTML = "Agregar Nuevo Registro";
-                    btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
+                    document.querySelector('.form-card h3').innerHTML = "/ INICIALIZAR_NUEVO_REGISTRO";
+                    btnSubmitForm.innerHTML = "TRANSMITIR";
                     btnCancelEdit.style.display = "none";
                 });
             }
@@ -1109,13 +910,12 @@
             if (addProviderForm) {
                 addProviderForm.addEventListener('submit', async (e) => {
                     e.preventDefault(); 
-                    
-                    btnSubmitForm.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Guardando...";
+                    const origText = btnSubmitForm.innerHTML;
+                    btnSubmitForm.innerHTML = "EJECUTANDO...";
                     btnSubmitForm.disabled = true;
 
                     try {
                         if (editingId) {
-                            // --- MODO EDICIÓN ---
                             const index = suppliersData.findIndex(item => item.id === editingId);
                             if (index !== -1) {
                                 suppliersData[index].platform = document.getElementById('p-platform').value.toUpperCase();
@@ -1126,25 +926,17 @@
                                 suppliersData[index].updated = new Date().toISOString();
                             }
                             
-                            // Sincronizar masivamente para reflejar el cambio en Sheets
-                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
-                                method: 'POST',
-                                body: JSON.stringify(suppliersData)
-                            });
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(suppliersData) });
                             const result = await response.json();
-                            
                             if (!result.success) throw new Error(result.error);
                             
-                            alert('¡Registro actualizado correctamente en la nube!');
-                            
+                            showToast("NODO RECONFIGURADO.", "success");
                             editingId = null;
-                            document.querySelector('.form-card h3').innerHTML = "Agregar Nuevo Registro";
+                            document.querySelector('.form-card h3').innerHTML = "/ INICIALIZAR_NUEVO_REGISTRO";
                             btnCancelEdit.style.display = "none";
-                            btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
 
                         } else {
-                            // --- MODO NUEVO REGISTRO ---
-                            const generateId = () => "ID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+                            const generateId = () => "HASH-" + Math.random().toString(36).substr(2, 6).toUpperCase();
                             const newEntry = {
                                 id: generateId(),
                                 platform: document.getElementById('p-platform').value.toUpperCase(),
@@ -1155,17 +947,12 @@
                                 updated: new Date().toISOString()
                             };
                             
-                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
-                                method: 'POST',
-                                body: JSON.stringify(newEntry)
-                            });
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(newEntry) });
                             const result = await response.json();
-                            
                             if (!result.success) throw new Error(result.error);
 
                             suppliersData.push(newEntry);
-                            alert('¡Proveedor agregado y guardado en Google Sheets!');
-                            btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
+                            showToast("NUEVO NODO ENLAZADO.", "success");
                         }
 
                         currentData = [...suppliersData];
@@ -1174,106 +961,71 @@
 
                     } catch(error) {
                         console.error(error);
-                        alert("Hubo un error de conexión con la nube. Detalles: " + error.message);
-                        currentData = [...suppliersData];
-                        renderDashboard(); 
-                        btnSubmitForm.innerHTML = editingId ? "<i class='bx bx-save'></i> Actualizar Registro" : "<i class='bx bx-cloud-upload'></i> Guardar Registro";
+                        showToast("FALLA EN LA TRANSMISIÓN CLOUD.", "error");
                     } finally {
+                        btnSubmitForm.innerHTML = "TRANSMITIR";
                         btnSubmitForm.disabled = false;
                     }
                 });
             }
 
-            // ==========================================
-            // LÓGICA DE AJUSTES (SETTINGS)
-            // ==========================================
+            // AJUSTES BOTONES
+            document.getElementById('btn-sync-sheets').addEventListener('click', async function() {
+                this.innerHTML = "SINCRONIZANDO...";
+                this.disabled = true;
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(suppliersData) });
+                    const result = await response.json();
+                    if(result.success) showToast("VOLCADO DE MEMORIA EXITOSO.", "success");
+                    else throw new Error(result.error);
+                } catch (error) {
+                    showToast("ANOMALÍA EN LA SINCRONIZACIÓN.", "error");
+                } finally {
+                    this.innerHTML = "SINCRONIZAR";
+                    this.disabled = false;
+                }
+            });
 
-            const btnSyncSheets = document.getElementById('btn-sync-sheets');
-            if (btnSyncSheets) {
-                btnSyncSheets.addEventListener('click', async function() {
-                    this.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Sincronizando datos...";
-                    this.disabled = true;
+            document.getElementById('btn-export-data').addEventListener('click', () => {
+                const dataStr = JSON.stringify(suppliersData, null, 2);
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `KGB_BACKUP_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                showToast("EXTRACCIÓN COMPLETADA.", "info");
+            });
 
-                    try {
-                        const response = await fetch(GOOGLE_SHEETS_API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(suppliersData)
-                        });
-                        const result = await response.json();
-                        
-                        if(result.success) {
-                            this.classList.add('connected');
-                            this.innerHTML = "<i class='bx bx-check'></i> Datos Sincronizados";
-                            alert("¡Sincronización exitosa! Tu hoja de cálculo ha sido actualizada con el inventario actual.");
-                        } else {
-                            throw new Error(result.error);
-                        }
-                    } catch (error) {
-                        alert("Error al sincronizar con Google Sheets: " + error.message);
-                        this.innerHTML = "<i class='bx bx-error'></i> Error. Reintentar";
-                        this.classList.remove('connected');
-                    } finally {
-                        this.disabled = false;
-                    }
-                });
-            }
+            document.getElementById('btn-clear-data').addEventListener('click', () => {
+                if(confirm("¿PURGAR INTERFAZ VISUAL? (NO BORRA LA NUBE)")){
+                    suppliersData = []; currentData = []; renderDashboard(); 
+                    showToast("CACHÉ PURGADO.", "info");
+                }
+            });
 
-            const btnExportData = document.getElementById('btn-export-data');
-            if (btnExportData) {
-                btnExportData.addEventListener('click', () => {
-                    const dataStr = JSON.stringify(suppliersData, null, 2);
-                    const blob = new Blob([dataStr], { type: "application/json" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `backup_proveedores_${new Date().toISOString().split('T')[0]}.json`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            }
-
-            const btnClearData = document.getElementById('btn-clear-data');
-            if (btnClearData) {
-                btnClearData.addEventListener('click', () => {
-                    const confirmacion = confirm("¿Estás seguro de querer limpiar tu vista actual? Esto NO borra tu base de datos de Google Sheets, solo limpia esta pantalla.");
-                    if (confirmacion) {
-                        suppliersData = []; 
-                        currentData = [];
-                        renderDashboard(); 
-                    }
-                });
-            }
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                const text = document.querySelector('#theme-toggle span');
+                text.textContent = newTheme === 'dark' ? 'MODO ÓPTICO' : 'MODO CYBER';
+                // Reiniciar pagina para regenerar el tunel 3D con nuevos colores
+                location.reload(); 
+            });
         }
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const icon = themeToggle.querySelector('i');
-            const text = themeToggle.querySelector('span');
-            if(theme === 'dark') {
-                icon.className = 'bx bx-sun';
-                text.textContent = 'Modo Claro';
-            } else {
-                icon.className = 'bx bx-moon';
-                text.textContent = 'Modo Oscuro';
-            }
-        }
-
-        // ================= RENDERING =================
-
+        // =========================================
+        // FUNCIONES DE RENDERIZADO VISUAL
+        // =========================================
         function renderDashboard() {
             renderStats();
             renderBestDeals();
             renderTopProviders();
             renderAdvancedStats(); 
             renderManagementTable();
-            handleSort(); 
+            renderPlatformFilters();
+            applyFiltersAndSort(); 
         }
 
         function renderStats() {
@@ -1282,110 +1034,99 @@
             const totalLicenses = suppliersData.reduce((acc, d) => acc + d.licenses, 0);
             const avgPrice = suppliersData.length > 0 ? (suppliersData.reduce((acc, d) => acc + d.price, 0) / suppliersData.length).toFixed(2) : "0.00";
             
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon icon-blue"><i class='bx bx-tv'></i></div>
-                    <div class="stat-info"><h4>Plataformas Activas</h4><h2>${platforms}</h2></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon icon-green"><i class='bx bx-store'></i></div>
-                    <div class="stat-info"><h4>Proveedores</h4><h2>${providers}</h2></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon icon-orange"><i class='bx bx-key'></i></div>
-                    <div class="stat-info"><h4>Licencias Disponibles</h4><h2>${totalLicenses}</h2></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon icon-red"><i class='bx bx-money'></i></div>
-                    <div class="stat-info"><h4>Precio Promedio</h4><h2>S/ ${avgPrice}</h2></div>
-                </div>
+            document.getElementById('stats-container').innerHTML = `
+                <div class="stat-card glass-panel"><div class="stat-icon icon-blue"><i class='bx bx-cube-alt'></i></div>
+                    <div class="stat-info"><h4>REDES ACTIVAS</h4><h2>${platforms}</h2></div></div>
+                <div class="stat-card glass-panel"><div class="stat-icon icon-green"><i class='bx bx-network-chart'></i></div>
+                    <div class="stat-info"><h4>NODOS</h4><h2>${providers}</h2></div></div>
+                <div class="stat-card glass-panel"><div class="stat-icon icon-orange"><i class='bx bx-key'></i></div>
+                    <div class="stat-info"><h4>UNIDADES</h4><h2>${totalLicenses}</h2></div></div>
+                <div class="stat-card glass-panel"><div class="stat-icon icon-red"><i class='bx bx-line-chart'></i></div>
+                    <div class="stat-info"><h4>PROMEDIO (S/)</h4><h2>${avgPrice}</h2></div></div>
             `;
         }
 
         function renderBestDeals() {
             const bestDealsMap = suppliersData.reduce((acc, curr) => {
-                if (curr.licenses > 0) {
-                    if (!acc[curr.platform] || curr.price < acc[curr.platform].price) {
-                        acc[curr.platform] = curr;
-                    }
-                }
+                if (curr.licenses > 0 && (!acc[curr.platform] || curr.price < acc[curr.platform].price)) acc[curr.platform] = curr;
                 return acc;
             }, {});
-
             const deals = Object.values(bestDealsMap);
+            
+            if (deals.length === 0) { document.getElementById('platform-cards').innerHTML = `<p style="font-size:11px; color:var(--text-muted); font-family:'Share Tech Mono';">/ AUSENCIA DE DATOS</p>`; return; }
 
-            if (deals.length === 0) {
-                platformCards.innerHTML = `<p style="color:var(--text-muted);">No hay ofertas disponibles con stock.</p>`;
-                return;
-            }
-
-            platformCards.innerHTML = deals.map(deal => `
+            document.getElementById('platform-cards').innerHTML = deals.map(deal => `
                 <div class="platform-card">
-                    <div class="best-badge">MEJOR PRECIO</div>
-                    <div class="platform-card-header">
+                    <div class="best-badge">ÓPTIMO</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span class="platform-name">${deal.platform}</span>
-                        <span class="platform-price">S/ ${deal.price.toFixed(2)}</span>
+                        <span class="platform-price">S/${deal.price.toFixed(2)}</span>
                     </div>
                     <div class="platform-details">
-                        <p>Página: <span>${deal.website}</span></p>
-                        <p>Proveedor: <span>${deal.provider}</span></p>
-                        <p>Licencias: <span>${deal.licenses} u.</span></p>
-                        <p>Actualizado: <span>${timeAgo(deal.updated)}</span></p>
+                        <p>HOST: <span>${deal.website}</span></p>
+                        <p>FIRMA: <span>${deal.provider}</span></p>
+                        <p>STOCK: <span>${deal.licenses} u.</span></p>
                     </div>
                 </div>
             `).join('');
         }
 
         function renderTopProviders() {
-            const sortedTop = [...suppliersData]
-                .filter(item => item.licenses > 0)
-                .sort((a, b) => (a.price - b.price) || (b.licenses - a.licenses));
+            const sortedTop = [...suppliersData].filter(item => item.licenses > 0).sort((a, b) => (a.price - b.price) || (b.licenses - a.licenses)).slice(0, 3);
+            if (sortedTop.length === 0) { document.getElementById('top-providers').innerHTML = `<p style="font-size:11px; color:var(--text-muted); font-family:'Share Tech Mono';">/ SIN DATOS</p>`; return; }
 
-            const top3 = sortedTop.slice(0, 3);
-
-            if (top3.length === 0) {
-                topProviders.innerHTML = `<p style="color:var(--text-muted);">Sin datos suficientes.</p>`;
-                return;
-            }
-
-            topProviders.innerHTML = top3.map((item, index) => `
+            document.getElementById('top-providers').innerHTML = sortedTop.map((item, index) => `
                 <div class="top-item">
                     <div class="top-rank rank-${index + 1}">${index + 1}</div>
-                    <div class="top-info">
-                        <h4>${item.platform} por S/ ${item.price.toFixed(2)}</h4>
-                        <p>${item.provider} (${item.website}) • ${item.licenses} uds</p>
+                    <div style="flex-grow:1;">
+                        <h4 style="font-family:'Rajdhani'; font-size:14px; color:#fff;">${item.platform} // S/ ${item.price.toFixed(2)}</h4>
+                        <p style="font-size:10px; color:var(--secondary); font-family:'Share Tech Mono';">${item.provider} [${item.website}] • ${item.licenses} uds</p>
                     </div>
                 </div>
             `).join('');
         }
 
+        function renderPlatformFilters() {
+            const container = document.getElementById('platform-filters');
+            const platforms = [...new Set(suppliersData.map(d => d.platform))].sort();
+            let html = `<button class="filter-btn ${activePlatformFilter === 'ALL' ? 'active' : ''}" data-platform="ALL">ESPECTRO TOTAL</button>`;
+            platforms.forEach(plat => {
+                html += `<button class="filter-btn ${activePlatformFilter === plat ? 'active' : ''}" data-platform="${plat}">${plat}</button>`;
+            });
+            container.innerHTML = html;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    activePlatformFilter = e.target.getAttribute('data-platform');
+                    if (activePlatformFilter !== 'ALL') {
+                        document.getElementById('global-search').value = '';
+                        document.getElementById('sort-select').value = 'price-asc';
+                    }
+                    renderPlatformFilters(); 
+                    applyFiltersAndSort(); 
+                });
+            });
+        }
+
         function renderTable(data) {
             if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; font-family:'Share Tech Mono'; color:var(--danger);">/ 0 COINCIDENCIAS</td></tr>`;
                 return;
             }
-
             tableBody.innerHTML = data.map(item => {
-                let badgeClass = 'badge-success';
-                let statusText = 'En Stock';
-
-                if (item.licenses === 0) {
-                    badgeClass = 'badge-danger';
-                    statusText = 'Agotado';
-                } else if (item.licenses < 15) {
-                    badgeClass = 'badge-warning';
-                    statusText = 'Poco Stock';
-                }
+                let color = 'var(--success)'; let text = 'OPERATIVO';
+                if (item.licenses === 0) { color = 'var(--danger)'; text = 'CAÍDO'; } 
+                else if (item.licenses < 15) { color = 'var(--warning)'; text = 'CRÍTICO'; }
 
                 return `
                     <tr>
-                        <td style="font-weight: 700;">${item.platform}</td>
-                        <td>${item.website}</td>
+                        <td style="color:var(--text-main); font-size:14px;">${item.platform}</td>
+                        <td style="color:var(--secondary); font-family:'Share Tech Mono'; font-size:11px;">${item.website}</td>
                         <td>${item.provider}</td>
-                        <td style="color: var(--primary); font-weight: 700;">S/ ${item.price.toFixed(2)}</td>
+                        <td style="color: ${color}; font-size:14px;">S/ ${item.price.toFixed(2)}</td>
                         <td>${item.licenses}</td>
-                        <td>${timeAgo(item.updated)}</td>
-                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td style="font-size:10px; font-family:'Share Tech Mono'; color:var(--text-muted);">${timeAgo(item.updated)}</td>
+                        <td><span class="badge" style="border-color:${color}; color:${color};">${text}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -1393,34 +1134,24 @@
 
         function renderManagementTable() {
             const tbody = document.getElementById('management-table-body');
-            if (!tbody) return;
-
             const sortedData = [...suppliersData].sort((a, b) => new Date(b.updated) - new Date(a.updated));
-
-            if (sortedData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay registros en el historial</td></tr>`;
-                return;
-            }
+            
+            if (sortedData.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; font-family:'Share Tech Mono';">/ HISTORIAL VACÍO</td></tr>`; return; }
 
             tbody.innerHTML = sortedData.map(item => `
                 <tr>
-                    <td style="color: var(--text-muted); font-size: 12px;">${item.id}</td>
-                    <td style="font-weight: 700;">${item.platform}</td>
+                    <td style="color: var(--secondary); font-family:'Share Tech Mono'; font-size: 10px;">${item.id}</td>
+                    <td style="color:#fff;">${item.platform}</td>
                     <td>${item.provider}</td>
-                    <td style="color: var(--primary); font-weight: 700;">S/ ${item.price.toFixed(2)}</td>
-                    <td>${item.licenses}</td>
+                    <td style="color: var(--success);">S/ ${item.price.toFixed(2)}</td>
+                    <td style="font-family:'Share Tech Mono';">${item.licenses}</td>
                     <td>
-                        <button class="btn-edit" data-id="${item.id}" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size: 18px; margin-right: 8px;" title="Editar registro">
-                            <i class='bx bx-edit'></i>
-                        </button>
-                        <button class="btn-delete" data-id="${item.id}" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size: 18px;" title="Eliminar registro">
-                            <i class='bx bx-trash'></i>
-                        </button>
+                        <button class="btn-edit" data-id="${item.id}" style="background:none; border:none; color:var(--secondary); cursor:pointer; font-size: 16px; margin-right: 8px;"><i class='bx bx-pencil'></i></button>
+                        <button class="btn-delete" data-id="${item.id}" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size: 16px;"><i class='bx bx-x-circle'></i></button>
                     </td>
                 </tr>
             `).join('');
 
-            // Evento Editar
             document.querySelectorAll('.btn-edit').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = e.currentTarget.getAttribute('data-id');
@@ -1431,40 +1162,28 @@
                         document.getElementById('p-provider').value = itemToEdit.provider;
                         document.getElementById('p-price').value = itemToEdit.price;
                         document.getElementById('p-licenses').value = itemToEdit.licenses;
-
                         editingId = id;
-                        document.querySelector('.form-card h3').innerHTML = "Editar Registro";
-                        const btnSubmitForm = document.getElementById('btn-submit-form');
-                        if(btnSubmitForm) btnSubmitForm.innerHTML = "<i class='bx bx-save'></i> Actualizar Registro";
-                        
-                        const btnCancelEdit = document.getElementById('btn-cancel-edit');
-                        if(btnCancelEdit) btnCancelEdit.style.display = "inline-flex";
-
+                        document.querySelector('.form-card h3').innerHTML = "/ RECONFIGURAR_REGISTRO";
+                        document.getElementById('btn-submit-form').innerHTML = "SOBRESCRIBIR";
+                        document.getElementById('btn-cancel-edit').style.display = "inline-flex";
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
             });
 
-            // Evento Eliminar con Sincronización a la nube
             document.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    const confirmacion = confirm("¿Deseas eliminar permanentemente este registro?");
-                    if (confirmacion) {
+                    if(confirm("¿ELIMINAR NODO PERMANENTEMENTE?")){
+                        const id = e.currentTarget.getAttribute('data-id');
                         suppliersData = suppliersData.filter(item => item.id !== id);
-                        currentData = [...suppliersData];
                         renderDashboard(); 
-                        
                         try {
-                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
-                                method: 'POST',
-                                body: JSON.stringify(suppliersData)
-                            });
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, { method: 'POST', body: JSON.stringify(suppliersData) });
                             const result = await response.json();
                             if (!result.success) throw new Error(result.error);
+                            showToast("NODO ELIMINADO.", "success");
                         } catch(err) {
-                            console.log("Error sincronizando eliminación: ", err);
-                            alert("Aviso: El registro se eliminó de tu pantalla, pero hubo un error actualizando Google Sheets. Error: " + err.message);
+                            showToast("FALLA EN LA ELIMINACIÓN CLOUD.", "error");
                         }
                     }
                 });
@@ -1475,14 +1194,10 @@
             const totalInventoryValue = suppliersData.reduce((acc, item) => acc + (item.price * item.licenses), 0);
             document.getElementById('adv-total-value').textContent = `S/ ${totalInventoryValue.toFixed(2)}`;
 
-            const avgPrice = suppliersData.length > 0 
-                ? (suppliersData.reduce((acc, item) => acc + item.price, 0) / suppliersData.length).toFixed(2) 
-                : 0;
+            const avgPrice = suppliersData.length > 0 ? (suppliersData.reduce((acc, item) => acc + item.price, 0) / suppliersData.length).toFixed(2) : 0;
             document.getElementById('adv-avg-price').textContent = `S/ ${avgPrice}`;
 
-            const platformStats = {};
-            let maxLicenses = 0; 
-
+            const platformStats = {}; let maxLicenses = 0; 
             suppliersData.forEach(item => {
                 if (!platformStats[item.platform]) platformStats[item.platform] = { licenses: 0, priceSum: 0, count: 0 };
                 platformStats[item.platform].licenses += item.licenses;
@@ -1490,81 +1205,68 @@
                 platformStats[item.platform].count += 1;
             });
 
-            for (const plat in platformStats) {
-                if (platformStats[plat].licenses > maxLicenses) maxLicenses = platformStats[plat].licenses;
-            }
+            for (const plat in platformStats) { if (platformStats[plat].licenses > maxLicenses) maxLicenses = platformStats[plat].licenses; }
 
-            const barsHtml = Object.keys(platformStats)
-                .sort((a, b) => platformStats[b].licenses - platformStats[a].licenses)
+            const barsHtml = Object.keys(platformStats).sort((a, b) => platformStats[b].licenses - platformStats[a].licenses)
                 .map(plat => {
                     const stat = platformStats[plat];
                     const percentage = maxLicenses === 0 ? 0 : (stat.licenses / maxLicenses) * 100;
-                    return `
-                        <div class="bar-item">
-                            <div class="bar-label"><span>${plat}</span><span>${stat.licenses} u.</span></div>
-                            <div class="bar-track"><div class="bar-fill" style="width: ${percentage}%"></div></div>
-                        </div>
-                    `;
+                    return `<div style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; font-family:'Share Tech Mono'; color:var(--secondary); margin-bottom:4px;"><span>${plat}</span><span>${stat.licenses} U</span></div>
+                        <div style="width:100%; height:4px; background:rgba(0,229,255,0.1); overflow:hidden;">
+                            <div style="height:100%; width:${percentage}%; background:var(--secondary); box-shadow:0 0 10px var(--secondary); transition: width 1s ease;"></div>
+                        </div></div>`;
                 }).join('');
-            document.getElementById('adv-licenses-bars').innerHTML = barsHtml || '<p style="color:var(--text-muted)">No hay datos.</p>';
+            document.getElementById('adv-licenses-bars').innerHTML = barsHtml || '<p style="font-family:\'Share Tech Mono\'; font-size:11px;">/ SIN MÉTRICAS</p>';
 
-            const pricesHtml = Object.keys(platformStats)
-                .sort((a, b) => a.localeCompare(b))
+            const pricesHtml = Object.keys(platformStats).sort((a, b) => a.localeCompare(b))
                 .map(plat => {
-                    const stat = platformStats[plat];
-                    const avgPlatformPrice = (stat.priceSum / stat.count).toFixed(2);
-                    return `
-                        <div class="list-item"><span>${plat}</span><span style="color: var(--primary);">S/ ${avgPlatformPrice}</span></div>
-                    `;
+                    const avgPlatformPrice = (platformStats[plat].priceSum / platformStats[plat].count).toFixed(2);
+                    return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.1); font-family:'Share Tech Mono'; font-size:12px;">
+                        <span style="color:#fff;">${plat}</span><span style="color:var(--primary); text-shadow:0 0 5px var(--primary-glow);">S/ ${avgPlatformPrice}</span></div>`;
                 }).join('');
-            document.getElementById('adv-prices-list').innerHTML = pricesHtml || '<p style="color:var(--text-muted)">No hay datos.</p>';
+            document.getElementById('adv-prices-list').innerHTML = pricesHtml || '<p style="font-family:\'Share Tech Mono\'; font-size:11px;">/ SIN MÉTRICAS</p>';
         }
 
-        // ================= FILTROS Y ORDENAMIENTO =================
-
+        // =========================================
+        // UTILIDADES Y LÓGICA DE DATOS
+        // =========================================
         function handleSearch(e) {
-            const term = e.target.value.toLowerCase();
-            currentData = suppliersData.filter(item => 
-                item.platform.toLowerCase().includes(term) ||
-                item.provider.toLowerCase().includes(term) ||
-                item.website.toLowerCase().includes(term)
-            );
-            handleSort(); 
+            if (activePlatformFilter !== 'ALL') { activePlatformFilter = 'ALL'; renderPlatformFilters(); }
+            applyFiltersAndSort(); 
         }
 
-        function handleSort() {
-            const sortBy = sortSelect.value;
+        function handleSort() { applyFiltersAndSort(); }
+
+        function applyFiltersAndSort() {
+            const term = document.getElementById('global-search').value.toLowerCase();
+            const sortBy = document.getElementById('sort-select').value;
+
+            currentData = suppliersData.filter(item => {
+                const matchesSearch = item.platform.toLowerCase().includes(term) || item.provider.toLowerCase().includes(term) || item.website.toLowerCase().includes(term);
+                const matchesPlatform = activePlatformFilter === 'ALL' || item.platform === activePlatformFilter;
+                return matchesSearch && matchesPlatform;
+            });
+
             currentData.sort((a, b) => {
                 switch(sortBy) {
                     case 'price-asc': return a.price - b.price;
                     case 'licenses-desc': return b.licenses - a.licenses;
                     case 'updated-desc': return new Date(b.updated) - new Date(a.updated);
                     case 'platform-asc': return a.platform.localeCompare(b.platform);
-                    case 'provider-asc': return a.provider.localeCompare(b.provider);
                     default: return 0;
                 }
             });
             renderTable(currentData);
         }
 
-        // ================= UTILIDADES =================
-
         function timeAgo(dateString) {
-            if (!dateString) return "Fecha desconocida";
-            const date = new Date(dateString);
-            const now = new Date();
-            const seconds = Math.floor((now - date) / 1000);
-            
-            if (seconds < 60) return 'hace unos segundos';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `hace ${minutes} min`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `hace ${hours} hr`;
-            const days = Math.floor(hours / 24);
-            if (days < 30) return `hace ${days} días`;
-            const months = Math.floor(days / 30);
-            if (months < 12) return `hace ${months} meses`;
-            return `hace ${Math.floor(months / 12)} años`;
+            if (!dateString) return "DESCONOCIDO";
+            const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+            if (seconds < 60) return 'AHORA';
+            const m = Math.floor(seconds / 60); if (m < 60) return `${m}M`;
+            const h = Math.floor(m / 60); if (h < 24) return `${h}H`;
+            return `${Math.floor(h / 24)}D`;
         }
     </script>
 </body>
