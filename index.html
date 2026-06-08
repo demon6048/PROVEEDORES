@@ -860,13 +860,14 @@
                             <input type="number" id="p-licenses" required min="0" placeholder="EJ. 20">
                         </div>
                     </div>
-                    <div style="margin-top: 20px; text-align: right;">
-                        <button type="submit" class="btn-primary"><i class='bx bx-cloud-upload'></i> Guardar Registro</button>
+                    <div id="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button type="button" id="btn-cancel-edit" class="btn-outline" style="display: none;"><i class='bx bx-x'></i> Cancelar</button>
+                        <button type="submit" id="btn-submit-form" class="btn-primary"><i class='bx bx-cloud-upload'></i> Guardar Registro</button>
                     </div>
                 </form>
             </div>
             
-            <!-- HISTORIAL DE GESTIÓN (Nuevo) -->
+            <!-- HISTORIAL DE GESTIÓN -->
             <div class="table-section" style="margin-top: 24px;">
                 <div class="section-title" style="font-size: 16px; margin-bottom: 16px;">
                     <i class='bx bx-history'></i> Historial de Registros
@@ -980,19 +981,19 @@
     <!-- SCRIPTS DE LA APLICACIÓN -->
     <script>
         // =========================================
-        // URL DE TU API DE GOOGLE APPS SCRIPT
+        // NUEVA URL DE TU API DE GOOGLE APPS SCRIPT
         // =========================================
-        const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwIBvrX1lXGHtyez-hfmxtQ-dbLT23tjLDOYa5NirHFnTN7ZvakLMpir1joUL6L0KORng/exec";
+        const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzy3kVcs918Xr5YLjBfgMGCCiX_IJ3wYO9omHR6VIPDz-Va0ovadQUaKJBpBlEn-Ag0Dg/exec";
 
-        // Datos de ejemplo como respaldo (por si Sheets está vacío la 1era vez)
+        // Datos de ejemplo como respaldo (por si Sheets está vacío o falla la conexión inicial)
         const MOCK_JSON_DATA = [
-            { "id": "1", "platform": "NETFLIX", "website": "FLUX", "provider": "CARLOS", "price": 8, "licenses": 20, "updated": "2026-06-07T19:55:00Z" },
-            { "id": "2", "platform": "DISNEY+", "website": "STREAMMARKET", "provider": "JUAN", "price": 5, "licenses": 150, "updated": "2026-06-07T20:10:00Z" }
+            { "id": "1", "platform": "NETFLIX", "website": "FLUX", "provider": "CARLOS", "price": 8, "licenses": 20, "updated": "2026-06-07T19:55:00Z" }
         ];
 
         // Estado Global
         let suppliersData = [];
         let currentData = [];
+        let editingId = null; // Controla si estamos agregando o editando un registro
 
         // Elementos DOM
         const tableBody = document.getElementById('table-body');
@@ -1017,23 +1018,20 @@
         // 1. CARGA DE DATOS DESDE GOOGLE SHEETS
         async function loadData() {
             try {
-                // Indicador visual de carga en la tabla
                 tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Conectando con Google Sheets... <i class='bx bx-loader-alt bx-spin'></i></td></tr>`;
 
-                // Petición GET a tu API
                 const response = await fetch(GOOGLE_SHEETS_API_URL);
                 const data = await response.json();
                 
                 if (data && data.length > 0) {
-                    suppliersData = data; // Usar los datos de la nube
+                    suppliersData = data; 
                 } else {
-                    suppliersData = MOCK_JSON_DATA; // Si la nube está vacía, mostrar ejemplo
+                    suppliersData = MOCK_JSON_DATA; 
                 }
                 
                 currentData = [...suppliersData];
                 renderDashboard();
                 
-                // Actualizar estado visual a "Online"
                 const dbBadge = document.getElementById('db-status-badge');
                 if(dbBadge) {
                     dbBadge.className = 'status-badge online';
@@ -1041,8 +1039,7 @@
                 }
 
             } catch (error) {
-                console.error("Error al cargar datos desde Sheets, usando modo local:", error);
-                
+                console.error("Error al cargar datos:", error);
                 suppliersData = MOCK_JSON_DATA;
                 currentData = [...suppliersData];
                 renderDashboard();
@@ -1056,7 +1053,7 @@
         }
 
         function setupEvents() {
-            // Convertir automáticamente a MAYÚSCULAS todo texto ingresado
+            // Mayúsculas automáticas
             document.addEventListener('input', (e) => {
                 if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
                     const start = e.target.selectionStart;
@@ -1078,7 +1075,7 @@
                 updateThemeIcon(newTheme);
             });
 
-            // Lógica de navegación SPA
+            // Navegación SPA
             navItems.forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1093,56 +1090,96 @@
             });
 
             // ==========================================
-            // 2. ENVIAR NUEVO PROVEEDOR A GOOGLE SHEETS
+            // 2. ENVIAR O EDITAR PROVEEDOR (NUBE)
             // ==========================================
             const addProviderForm = document.getElementById('add-provider-form');
+            const btnCancelEdit = document.getElementById('btn-cancel-edit');
+            const btnSubmitForm = document.getElementById('btn-submit-form');
+
+            if (btnCancelEdit) {
+                btnCancelEdit.addEventListener('click', () => {
+                    editingId = null;
+                    addProviderForm.reset();
+                    document.querySelector('.form-card h3').innerHTML = "Agregar Nuevo Registro";
+                    btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
+                    btnCancelEdit.style.display = "none";
+                });
+            }
+
             if (addProviderForm) {
                 addProviderForm.addEventListener('submit', async (e) => {
                     e.preventDefault(); 
                     
-                    const btnSubmit = addProviderForm.querySelector('button[type="submit"]');
-                    const originalText = btnSubmit.innerHTML;
-                    btnSubmit.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Guardando en Nube...";
-                    btnSubmit.disabled = true;
+                    btnSubmitForm.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Guardando...";
+                    btnSubmitForm.disabled = true;
 
-                    // Generar un ID básico aleatorio
-                    const generateId = () => Math.random().toString(36).substr(2, 9);
-                    
-                    const newEntry = {
-                        id: generateId(),
-                        platform: document.getElementById('p-platform').value.toUpperCase(),
-                        website: document.getElementById('p-website').value.toUpperCase(),
-                        provider: document.getElementById('p-provider').value.toUpperCase(),
-                        price: parseFloat(document.getElementById('p-price').value),
-                        licenses: parseInt(document.getElementById('p-licenses').value, 10),
-                        updated: new Date().toISOString()
-                    };
-                    
                     try {
-                        // POST A GOOGLE SHEETS
-                        await fetch(GOOGLE_SHEETS_API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(newEntry)
-                        });
+                        if (editingId) {
+                            // --- MODO EDICIÓN ---
+                            const index = suppliersData.findIndex(item => item.id === editingId);
+                            if (index !== -1) {
+                                suppliersData[index].platform = document.getElementById('p-platform').value.toUpperCase();
+                                suppliersData[index].website = document.getElementById('p-website').value.toUpperCase();
+                                suppliersData[index].provider = document.getElementById('p-provider').value.toUpperCase();
+                                suppliersData[index].price = parseFloat(document.getElementById('p-price').value);
+                                suppliersData[index].licenses = parseInt(document.getElementById('p-licenses').value, 10);
+                                suppliersData[index].updated = new Date().toISOString();
+                            }
+                            
+                            // Sincronizar masivamente para reflejar el cambio en Sheets
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
+                                method: 'POST',
+                                body: JSON.stringify(suppliersData)
+                            });
+                            const result = await response.json();
+                            
+                            if (!result.success) throw new Error(result.error);
+                            
+                            alert('¡Registro actualizado correctamente en la nube!');
+                            
+                            editingId = null;
+                            document.querySelector('.form-card h3').innerHTML = "Agregar Nuevo Registro";
+                            btnCancelEdit.style.display = "none";
+                            btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
 
-                        suppliersData.push(newEntry);
+                        } else {
+                            // --- MODO NUEVO REGISTRO ---
+                            const generateId = () => "ID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+                            const newEntry = {
+                                id: generateId(),
+                                platform: document.getElementById('p-platform').value.toUpperCase(),
+                                website: document.getElementById('p-website').value.toUpperCase(),
+                                provider: document.getElementById('p-provider').value.toUpperCase(),
+                                price: parseFloat(document.getElementById('p-price').value),
+                                licenses: parseInt(document.getElementById('p-licenses').value, 10),
+                                updated: new Date().toISOString()
+                            };
+                            
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
+                                method: 'POST',
+                                body: JSON.stringify(newEntry)
+                            });
+                            const result = await response.json();
+                            
+                            if (!result.success) throw new Error(result.error);
+
+                            suppliersData.push(newEntry);
+                            alert('¡Proveedor agregado y guardado en Google Sheets!');
+                            btnSubmitForm.innerHTML = "<i class='bx bx-cloud-upload'></i> Guardar Registro";
+                        }
+
                         currentData = [...suppliersData];
-                        renderDashboard(); // Esto refresca tablas, historial y ESTADÍSTICAS al instante
+                        renderDashboard(); 
                         addProviderForm.reset();
-                        
-                        alert('¡Proveedor agregado y guardado en Google Sheets!');
-                        document.querySelector('.nav-item[data-target="view-dashboard"]').click();
 
                     } catch(error) {
                         console.error(error);
-                        alert("Hubo un error de conexión con la nube. Se ha guardado localmente de manera temporal.");
-                        // Guardar local
-                        suppliersData.push(newEntry);
+                        alert("Hubo un error de conexión con la nube. Detalles: " + error.message);
                         currentData = [...suppliersData];
-                        renderDashboard(); // Actualizar todo también si hay error de red
+                        renderDashboard(); 
+                        btnSubmitForm.innerHTML = editingId ? "<i class='bx bx-save'></i> Actualizar Registro" : "<i class='bx bx-cloud-upload'></i> Guardar Registro";
                     } finally {
-                        btnSubmit.innerHTML = originalText;
-                        btnSubmit.disabled = false;
+                        btnSubmitForm.disabled = false;
                     }
                 });
             }
@@ -1151,7 +1188,6 @@
             // LÓGICA DE AJUSTES (SETTINGS)
             // ==========================================
 
-            // 3. Botón Google Sheets (Sincronización Real de todo el inventario)
             const btnSyncSheets = document.getElementById('btn-sync-sheets');
             if (btnSyncSheets) {
                 btnSyncSheets.addEventListener('click', async function() {
@@ -1159,12 +1195,10 @@
                     this.disabled = true;
 
                     try {
-                        // Enviar TODO el arreglo al script (el script reemplazará la hoja)
                         const response = await fetch(GOOGLE_SHEETS_API_URL, {
                             method: 'POST',
                             body: JSON.stringify(suppliersData)
                         });
-                        
                         const result = await response.json();
                         
                         if(result.success) {
@@ -1175,7 +1209,7 @@
                             throw new Error(result.error);
                         }
                     } catch (error) {
-                        alert("Error al sincronizar con Google Sheets.");
+                        alert("Error al sincronizar con Google Sheets: " + error.message);
                         this.innerHTML = "<i class='bx bx-error'></i> Error. Reintentar";
                         this.classList.remove('connected');
                     } finally {
@@ -1184,7 +1218,6 @@
                 });
             }
 
-            // Exportar Datos Json local
             const btnExportData = document.getElementById('btn-export-data');
             if (btnExportData) {
                 btnExportData.addEventListener('click', () => {
@@ -1201,19 +1234,18 @@
                 });
             }
 
-            // Limpiar Datos Locales
             const btnClearData = document.getElementById('btn-clear-data');
             if (btnClearData) {
                 btnClearData.addEventListener('click', () => {
                     const confirmacion = confirm("¿Estás seguro de querer limpiar tu vista actual? Esto NO borra tu base de datos de Google Sheets, solo limpia esta pantalla.");
-            if (confirmacion) {
-                suppliersData = []; 
-                currentData = [];
-                renderDashboard(); 
+                    if (confirmacion) {
+                        suppliersData = []; 
+                        currentData = [];
+                        renderDashboard(); 
+                    }
+                });
             }
-        });
-    }
-}
+        }
 
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -1240,7 +1272,7 @@
             renderBestDeals();
             renderTopProviders();
             renderAdvancedStats(); 
-            renderManagementTable(); // Nuevo: Renderizar el historial de proveedores
+            renderManagementTable();
             handleSort(); 
         }
 
@@ -1363,7 +1395,6 @@
             const tbody = document.getElementById('management-table-body');
             if (!tbody) return;
 
-            // Ordenar por actualización más reciente para que el último agregado salga primero
             const sortedData = [...suppliersData].sort((a, b) => new Date(b.updated) - new Date(a.updated));
 
             if (sortedData.length === 0) {
@@ -1379,6 +1410,9 @@
                     <td style="color: var(--primary); font-weight: 700;">S/ ${item.price.toFixed(2)}</td>
                     <td>${item.licenses}</td>
                     <td>
+                        <button class="btn-edit" data-id="${item.id}" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size: 18px; margin-right: 8px;" title="Editar registro">
+                            <i class='bx bx-edit'></i>
+                        </button>
                         <button class="btn-delete" data-id="${item.id}" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size: 18px;" title="Eliminar registro">
                             <i class='bx bx-trash'></i>
                         </button>
@@ -1386,15 +1420,52 @@
                 </tr>
             `).join('');
 
-            // Evento para eliminar registros del historial
-            document.querySelectorAll('.btn-delete').forEach(btn => {
+            // Evento Editar
+            document.querySelectorAll('.btn-edit').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = e.currentTarget.getAttribute('data-id');
-                    const confirmacion = confirm("¿Deseas eliminar este registro de la lista?\\n\\n(Nota: Se borrará localmente. Ve a 'Ajustes > Sincronizar a Sheets' después para actualizar la nube).");
+                    const itemToEdit = suppliersData.find(item => item.id === id);
+                    if (itemToEdit) {
+                        document.getElementById('p-platform').value = itemToEdit.platform;
+                        document.getElementById('p-website').value = itemToEdit.website;
+                        document.getElementById('p-provider').value = itemToEdit.provider;
+                        document.getElementById('p-price').value = itemToEdit.price;
+                        document.getElementById('p-licenses').value = itemToEdit.licenses;
+
+                        editingId = id;
+                        document.querySelector('.form-card h3').innerHTML = "Editar Registro";
+                        const btnSubmitForm = document.getElementById('btn-submit-form');
+                        if(btnSubmitForm) btnSubmitForm.innerHTML = "<i class='bx bx-save'></i> Actualizar Registro";
+                        
+                        const btnCancelEdit = document.getElementById('btn-cancel-edit');
+                        if(btnCancelEdit) btnCancelEdit.style.display = "inline-flex";
+
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Evento Eliminar con Sincronización a la nube
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const confirmacion = confirm("¿Deseas eliminar permanentemente este registro?");
                     if (confirmacion) {
                         suppliersData = suppliersData.filter(item => item.id !== id);
                         currentData = [...suppliersData];
-                        renderDashboard(); // Recalcula las estadísticas automáticamente
+                        renderDashboard(); 
+                        
+                        try {
+                            const response = await fetch(GOOGLE_SHEETS_API_URL, {
+                                method: 'POST',
+                                body: JSON.stringify(suppliersData)
+                            });
+                            const result = await response.json();
+                            if (!result.success) throw new Error(result.error);
+                        } catch(err) {
+                            console.log("Error sincronizando eliminación: ", err);
+                            alert("Aviso: El registro se eliminó de tu pantalla, pero hubo un error actualizando Google Sheets. Error: " + err.message);
+                        }
                     }
                 });
             });
