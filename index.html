@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Supplier Manager</title>
+    <!-- Fuentes modernas (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons para Iconografía -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <style>
+        /* =========================================
+           VARIABLES CSS Y TEMAS (Claro / Oscuro)
+        ========================================= */
+        :root {
+            --bg-body: #f4f7fe;
+            --bg-surface: #ffffff;
+            --text-main: #2b3674;
+            --text-muted: #a3aed1;
+            --border-color: #e2e8f0;
+            --primary: #4318ff;
+            --primary-hover: #3311db;
+            --success: #05cd99;
+            --danger: #ee5d50;
+            --warning: #ffce20;
+            --shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0b1437;
+            --bg-surface: #111c44;
+            --text-main: #ffffff;
+            --text-muted: #a3aed1;
+            --border-color: #1e293b;
+            --shadow: 0px 18px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* =========================================
+           SIDEBAR
+        ========================================= */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-surface);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(67, 24, 255, 0.05);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(163, 174, 209, 0.1);
+        }
+
+        /* =========================================
+           CONTENIDO PRINCIPAL & HEADER
+        ========================================= */
+        .main-content {
+            flex-grow: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 260px);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: var(--bg-surface);
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-body);
+            padding: 10px 20px;
+            border-radius: 30px;
+            width: 350px;
+        }
+
+        .search-bar i {
+            color: var(--text-main);
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            color: var(--text-main);
+            width: 100%;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* =========================================
+           ESTADÍSTICAS GLOBALES
+        ========================================= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .icon-blue { background: rgba(67, 24, 255, 0.1); color: var(--primary); }
+        .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
+        .icon-orange { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
+        .icon-red { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
+
+        .stat-info h4 {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .stat-info h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* =========================================
+           DASHBOARD GRID (Tarjetas & Top)
+        ========================================= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .platform-card {
+            background-color: var(--bg-surface);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .platform-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .platform-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .platform-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .platform-details p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .platform-details span {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .best-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--warning);
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .top-panel {
+            background-color: var(--bg-surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            background-color: var(--bg-body);
+        }
+
+        .top-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 14px;
+        }
+
+        .rank-1 { background-color: #FFD700; }
+        .rank-2 { background-color: #C0C0C0; }
+        .rank-3 { background-color: #CD7F32; }
+
+        .top-info h4 { font-size: 14px; margin-bottom: 4px; }
+        .top-info p { font-size: 12px; color: var(--text-muted); }
+
+        /* =========================================
+           TABLA DETALLADA
+        ========================================= */
+        .table-section {
+            background-color: var(--bg-surface);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .table-header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sort-control select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 13px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
+        .badge-warning { background-color: rgba(255, 206, 32, 0.1); color: var(--warning); }
+        .badge-danger { background-color: rgba(238, 93, 80, 0.1); color: var(--danger); }
+
+        /* =========================================
+           VISTAS DINÁMICAS (Navegación SPA)
+        ========================================= */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================
+           FORMULARIOS (Proveedores)
+        ========================================= */
+        .form-card {
+            background-color: var(--bg-surface);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 24, 255, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-primary:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* =========================================
+           ESTADÍSTICAS AVANZADAS
+        ========================================= */
+        .advanced-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .adv-card {
+            background-color: var(--bg-surface);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .adv-card h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .adv-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .adv-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .bars-container, .list-container { margin-top: 20px; }
+
+        .bar-item { margin-bottom: 16px; }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 10px;
+            background-color: var(--bg-body);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .list-item:last-child { border-bottom: none; }
+
+        /* =========================================
+           AJUSTES
+        ========================================= */
+        .settings-container {
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .settings-card {
+            background-color: var(--bg-surface);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .setting-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.online { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
+        .status-badge.online::before { content: ''; width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+        
+        .status-badge.status-warning { background-color: rgba(255, 206, 32, 0.1); color: var(--warning); }
+        .status-badge.status-warning::before { content: ''; width: 8px; height: 8px; background: var(--warning); border-radius: 50%; }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline:hover { background: var(--bg-body); }
+        
+        .btn-google { border-color: #4285F4; color: #4285F4; }
+        .btn-google:hover { background: rgba(66, 133, 244, 0.1); }
+        .btn-google.connected { background: #4285F4; color: white; border-color: #4285F4; }
+        .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
+        
+        .btn-danger {
+            background-color: rgba(238, 93, 80, 0.1);
+            color: var(--danger);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN
+        ========================================= */
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .setting-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                height: 100vh;
+                box-shadow: var(--shadow);
+            }
+            .sidebar.active { left: 0; }
+            .main-content { width: 100%; }
+            .mobile-menu-btn { display: block; }
+            .search-bar { width: auto; flex-grow: 1; margin: 0 15px; }
+            .header-profile span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <i class='bx bxs-carousel'></i>
+            <span>StreamMgr</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-target="view-dashboard"><i class='bx bxs-dashboard'></i> Dashboard</a>
+            <a href="#" class="nav-item" data-target="view-proveedores"><i class='bx bx-list-ul'></i> Proveedores</a>
+            <a href="#" class="nav-item" data-target="view-estadisticas"><i class='bx bx-chart'></i> Estadísticas</a>
+            <a href="#" class="nav-item" data-target="view-ajustes"><i class='bx bx-cog'></i> Ajustes</a>
+        </nav>
+        <div class="theme-toggle" id="theme-toggle">
+            <i class='bx bx-moon'></i>
+            <span>Modo Oscuro</span>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header>
+            <i class='bx bx-menu mobile-menu-btn' id="mobile-menu-btn"></i>
+            <div class="search-bar">
+                <i class='bx bx-search'></i>
+                <input type="text" id="global-search" placeholder="BUSCAR PLATAFORMA, PÁGINA O PROVEEDOR...">
+            </div>
+            <div class="header-profile">
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <!-- CONTENEDOR DE VISTAS -->
+        
+        <!-- VISTA 1: DASHBOARD (Principal) -->
+        <div id="view-dashboard" class="view-section active">
+            <!-- ESTADÍSTICAS -->
+            <div class="stats-grid" id="stats-container">
+                <!-- Renderizado dinámico -->
+            </div>
+
+            <!-- DASHBOARD GRID -->
+            <div class="dashboard-grid">
+                <!-- Tarjetas de Plataformas -->
+                <div class="cards-section">
+                    <h2 class="section-title"><i class='bx bxs-discount'></i> Mejores Precios por Plataforma</h2>
+                    <div class="cards-container" id="platform-cards">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </div>
+
+                <!-- Top Proveedores -->
+                <div class="top-panel">
+                    <h2 class="section-title"><i class='bx bxs-trophy'></i> Top Proveedores</h2>
+                    <div class="top-list" id="top-providers">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA DETALLADA -->
+            <div class="table-section">
+                <div class="table-header-controls">
+                    <h2 class="section-title"><i class='bx bx-table'></i> Catálogo Detallado</h2>
+                    <div class="sort-control">
+                        <label for="sort-select" style="font-size: 14px; color: var(--text-muted); margin-right: 8px;">Ordenar por:</label>
+                        <select id="sort-select">
+                            <option value="price-asc">Menor precio</option>
+                            <option value="licenses-desc">Mayor cantidad licencias</option>
+                            <option value="updated-desc">Actualización reciente</option>
+                            <option value="platform-asc">Plataforma (A-Z)</option>
+                            <option value="provider-asc">Proveedor (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plataforma</th>
+                                <th>Página</th>
+                                <th>Proveedor</th>
+                                <th>Precio</th>
+                                <th>Licencias</th>
+                                <th>Actualización</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Renderizado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 2: PROVEEDORES -->
+        <div id="view-proveedores" class="view-section">
+            <h2 class="section-title"><i class='bx bx-store-alt'></i> Gestión de Proveedores</h2>
+            
+            <div class="form-card">
+                <h3 style="margin-bottom: 20px; font-size: 16px;">Agregar Nuevo Registro</h3>
+                <form id="add-provider-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="p-platform">Plataforma</label>
+                            <input type="text" id="p-platform" required placeholder="EJ. NETFLIX">
+                        </div>
+                        <div class="form-group">
+                            <label for="p-website">Página Web</label>
+                            <input type="text" id="p-website" required placeholder="EJ. FLUX">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="p-provider">Nombre del Proveedor</label>
+                            <input type="text" id="p-provider" required placeholder="EJ. CARLOS">
+                        </div>
+                        <div class="form-group">
+                            <label for="p-price">Precio (S/)</label>
+                            <input type="number" id="p-price" required min="0" step="0.01" placeholder="EJ. 8.50">
+                        </div>
+                        <div class="form-group">
+                            <label for="p-licenses">Cantidad de Licencias</label>
+                            <input type="number" id="p-licenses" required min="0" placeholder="EJ. 20">
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button type="submit" class="btn-primary"><i class='bx bx-cloud-upload'></i> Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- HISTORIAL DE GESTIÓN (Nuevo) -->
+            <div class="table-section" style="margin-top: 24px;">
+                <div class="section-title" style="font-size: 16px; margin-bottom: 16px;">
+                    <i class='bx bx-history'></i> Historial de Registros
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Plataforma</th>
+                                <th>Proveedor</th>
+                                <th>Precio</th>
+                                <th>Licencias</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="management-table-body">
+                            <!-- Renderizado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: ESTADÍSTICAS -->
+        <div id="view-estadisticas" class="view-section">
+            <h2 class="section-title"><i class='bx bx-line-chart'></i> Estadísticas Avanzadas</h2>
+            
+            <div class="advanced-grid">
+                <div class="adv-card">
+                    <h3>Valor Total del Inventario</h3>
+                    <div class="adv-value" id="adv-total-value">S/ 0.00</div>
+                    <p>Capital estimado (Precio × Licencias de todo el stock)</p>
+                </div>
+                <div class="adv-card">
+                    <h3>Precio Promedio General</h3>
+                    <div class="adv-value" id="adv-avg-price">S/ 0.00</div>
+                    <p>Media aritmética entre todos los proveedores</p>
+                </div>
+            </div>
+
+            <div class="advanced-grid">
+                <div class="adv-card">
+                    <h3>Licencias por Plataforma (Stock)</h3>
+                    <div id="adv-licenses-bars" class="bars-container">
+                        <!-- Barras generadas por JS -->
+                    </div>
+                </div>
+                <div class="adv-card">
+                    <h3>Precio Promedio por Plataforma</h3>
+                    <div id="adv-prices-list" class="list-container">
+                        <!-- Lista generada por JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 4: AJUSTES -->
+        <div id="view-ajustes" class="view-section">
+            <h2 class="section-title"><i class='bx bx-cog'></i> Configuración del Sistema</h2>
+            
+            <div class="settings-container">
+                <!-- Integraciones -->
+                <div class="settings-card">
+                    <h3><i class='bx bx-plug'></i> Integraciones y Conexiones</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Base de Datos Principal</h4>
+                            <p>Estado de la conexión local/servidor.</p>
+                        </div>
+                        <div class="status-badge status-warning" id="db-status-badge">Conectando...</div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Sincronización con Google Sheets</h4>
+                            <p>Guarda todos los datos locales actuales hacia tu Google Sheet en la nube.</p>
+                        </div>
+                        <button id="btn-sync-sheets" class="btn-outline btn-google">
+                            <i class='bx bxl-google'></i> Sincronizar a Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gestión de Datos -->
+                <div class="settings-card">
+                    <h3><i class='bx bx-data'></i> Gestión de Datos</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Exportar Inventario</h4>
+                            <p>Descarga una copia de seguridad en formato JSON de todos los proveedores.</p>
+                        </div>
+                        <button id="btn-export-data" class="btn-outline">
+                            <i class='bx bx-download'></i> Descargar Backup
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Limpiar Base de Datos Local</h4>
+                            <p>Borra todos los registros actuales de esta vista. (No borra tu Google Sheet).</p>
+                        </div>
+                        <button id="btn-clear-data" class="btn-danger">
+                            <i class='bx bx-trash'></i> Eliminar Todo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SCRIPTS DE LA APLICACIÓN -->
+    <script>
+        // =========================================
+        // URL DE TU API DE GOOGLE APPS SCRIPT
+        // =========================================
+        const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwIBvrX1lXGHtyez-hfmxtQ-dbLT23tjLDOYa5NirHFnTN7ZvakLMpir1joUL6L0KORng/exec";
+
+        // Datos de ejemplo como respaldo (por si Sheets está vacío la 1era vez)
+        const MOCK_JSON_DATA = [
+            { "id": "1", "platform": "NETFLIX", "website": "FLUX", "provider": "CARLOS", "price": 8, "licenses": 20, "updated": "2026-06-07T19:55:00Z" },
+            { "id": "2", "platform": "DISNEY+", "website": "STREAMMARKET", "provider": "JUAN", "price": 5, "licenses": 150, "updated": "2026-06-07T20:10:00Z" }
+        ];
+
+        // Estado Global
+        let suppliersData = [];
+        let currentData = [];
+
+        // Elementos DOM
+        const tableBody = document.getElementById('table-body');
+        const platformCards = document.getElementById('platform-cards');
+        const topProviders = document.getElementById('top-providers');
+        const statsContainer = document.getElementById('stats-container');
+        const searchInput = document.getElementById('global-search');
+        const sortSelect = document.getElementById('sort-select');
+        const themeToggle = document.getElementById('theme-toggle');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const navItems = document.querySelectorAll('.nav-item');
+        const viewSections = document.querySelectorAll('.view-section');
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupEvents();
+            initTheme();
+        });
+
+        // 1. CARGA DE DATOS DESDE GOOGLE SHEETS
+        async function loadData() {
+            try {
+                // Indicador visual de carga en la tabla
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Conectando con Google Sheets... <i class='bx bx-loader-alt bx-spin'></i></td></tr>`;
+
+                // Petición GET a tu API
+                const response = await fetch(GOOGLE_SHEETS_API_URL);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    suppliersData = data; // Usar los datos de la nube
+                } else {
+                    suppliersData = MOCK_JSON_DATA; // Si la nube está vacía, mostrar ejemplo
+                }
+                
+                currentData = [...suppliersData];
+                renderDashboard();
+                
+                // Actualizar estado visual a "Online"
+                const dbBadge = document.getElementById('db-status-badge');
+                if(dbBadge) {
+                    dbBadge.className = 'status-badge online';
+                    dbBadge.innerHTML = "<i class='bx bx-cloud'></i> Conectado a Sheets";
+                }
+
+            } catch (error) {
+                console.error("Error al cargar datos desde Sheets, usando modo local:", error);
+                
+                suppliersData = MOCK_JSON_DATA;
+                currentData = [...suppliersData];
+                renderDashboard();
+                
+                const dbBadge = document.getElementById('db-status-badge');
+                if(dbBadge) {
+                    dbBadge.className = 'status-badge status-warning';
+                    dbBadge.innerHTML = "Modo Local (Offline)";
+                }
+            }
+        }
+
+        function setupEvents() {
+            // Convertir automáticamente a MAYÚSCULAS todo texto ingresado
+            document.addEventListener('input', (e) => {
+                if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    e.target.value = e.target.value.toUpperCase();
+                    e.target.setSelectionRange(start, end);
+                }
+            });
+
+            searchInput.addEventListener('input', handleSearch);
+            sortSelect.addEventListener('change', handleSort);
+            mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+            
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+
+            // Lógica de navegación SPA
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    viewSections.forEach(view => view.classList.remove('active'));
+                    const targetId = item.getAttribute('data-target');
+                    const targetView = document.getElementById(targetId);
+                    if (targetView) targetView.classList.add('active');
+                    if (window.innerWidth <= 768) sidebar.classList.remove('active');
+                });
+            });
+
+            // ==========================================
+            // 2. ENVIAR NUEVO PROVEEDOR A GOOGLE SHEETS
+            // ==========================================
+            const addProviderForm = document.getElementById('add-provider-form');
+            if (addProviderForm) {
+                addProviderForm.addEventListener('submit', async (e) => {
+                    e.preventDefault(); 
+                    
+                    const btnSubmit = addProviderForm.querySelector('button[type="submit"]');
+                    const originalText = btnSubmit.innerHTML;
+                    btnSubmit.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Guardando en Nube...";
+                    btnSubmit.disabled = true;
+
+                    // Generar un ID básico aleatorio
+                    const generateId = () => Math.random().toString(36).substr(2, 9);
+                    
+                    const newEntry = {
+                        id: generateId(),
+                        platform: document.getElementById('p-platform').value.toUpperCase(),
+                        website: document.getElementById('p-website').value.toUpperCase(),
+                        provider: document.getElementById('p-provider').value.toUpperCase(),
+                        price: parseFloat(document.getElementById('p-price').value),
+                        licenses: parseInt(document.getElementById('p-licenses').value, 10),
+                        updated: new Date().toISOString()
+                    };
+                    
+                    try {
+                        // POST A GOOGLE SHEETS
+                        await fetch(GOOGLE_SHEETS_API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(newEntry)
+                        });
+
+                        suppliersData.push(newEntry);
+                        currentData = [...suppliersData];
+                        renderDashboard(); // Esto refresca tablas, historial y ESTADÍSTICAS al instante
+                        addProviderForm.reset();
+                        
+                        alert('¡Proveedor agregado y guardado en Google Sheets!');
+                        document.querySelector('.nav-item[data-target="view-dashboard"]').click();
+
+                    } catch(error) {
+                        console.error(error);
+                        alert("Hubo un error de conexión con la nube. Se ha guardado localmente de manera temporal.");
+                        // Guardar local
+                        suppliersData.push(newEntry);
+                        currentData = [...suppliersData];
+                        renderDashboard(); // Actualizar todo también si hay error de red
+                    } finally {
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
+                    }
+                });
+            }
+
+            // ==========================================
+            // LÓGICA DE AJUSTES (SETTINGS)
+            // ==========================================
+
+            // 3. Botón Google Sheets (Sincronización Real de todo el inventario)
+            const btnSyncSheets = document.getElementById('btn-sync-sheets');
+            if (btnSyncSheets) {
+                btnSyncSheets.addEventListener('click', async function() {
+                    this.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Sincronizando datos...";
+                    this.disabled = true;
+
+                    try {
+                        // Enviar TODO el arreglo al script (el script reemplazará la hoja)
+                        const response = await fetch(GOOGLE_SHEETS_API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(suppliersData)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if(result.success) {
+                            this.classList.add('connected');
+                            this.innerHTML = "<i class='bx bx-check'></i> Datos Sincronizados";
+                            alert("¡Sincronización exitosa! Tu hoja de cálculo ha sido actualizada con el inventario actual.");
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    } catch (error) {
+                        alert("Error al sincronizar con Google Sheets.");
+                        this.innerHTML = "<i class='bx bx-error'></i> Error. Reintentar";
+                        this.classList.remove('connected');
+                    } finally {
+                        this.disabled = false;
+                    }
+                });
+            }
+
+            // Exportar Datos Json local
+            const btnExportData = document.getElementById('btn-export-data');
+            if (btnExportData) {
+                btnExportData.addEventListener('click', () => {
+                    const dataStr = JSON.stringify(suppliersData, null, 2);
+                    const blob = new Blob([dataStr], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `backup_proveedores_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            // Limpiar Datos Locales
+            const btnClearData = document.getElementById('btn-clear-data');
+            if (btnClearData) {
+                btnClearData.addEventListener('click', () => {
+                    const confirmacion = confirm("¿Estás seguro de querer limpiar tu vista actual? Esto NO borra tu base de datos de Google Sheets, solo limpia esta pantalla.");
+            if (confirmacion) {
+                suppliersData = []; 
+                currentData = [];
+                renderDashboard(); 
+            }
+        });
+    }
+}
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            const text = themeToggle.querySelector('span');
+            if(theme === 'dark') {
+                icon.className = 'bx bx-sun';
+                text.textContent = 'Modo Claro';
+            } else {
+                icon.className = 'bx bx-moon';
+                text.textContent = 'Modo Oscuro';
+            }
+        }
+
+        // ================= RENDERING =================
+
+        function renderDashboard() {
+            renderStats();
+            renderBestDeals();
+            renderTopProviders();
+            renderAdvancedStats(); 
+            renderManagementTable(); // Nuevo: Renderizar el historial de proveedores
+            handleSort(); 
+        }
+
+        function renderStats() {
+            const platforms = new Set(suppliersData.map(d => d.platform)).size;
+            const providers = new Set(suppliersData.map(d => d.provider)).size;
+            const totalLicenses = suppliersData.reduce((acc, d) => acc + d.licenses, 0);
+            const avgPrice = suppliersData.length > 0 ? (suppliersData.reduce((acc, d) => acc + d.price, 0) / suppliersData.length).toFixed(2) : "0.00";
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class='bx bx-tv'></i></div>
+                    <div class="stat-info"><h4>Plataformas Activas</h4><h2>${platforms}</h2></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-green"><i class='bx bx-store'></i></div>
+                    <div class="stat-info"><h4>Proveedores</h4><h2>${providers}</h2></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-orange"><i class='bx bx-key'></i></div>
+                    <div class="stat-info"><h4>Licencias Disponibles</h4><h2>${totalLicenses}</h2></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-red"><i class='bx bx-money'></i></div>
+                    <div class="stat-info"><h4>Precio Promedio</h4><h2>S/ ${avgPrice}</h2></div>
+                </div>
+            `;
+        }
+
+        function renderBestDeals() {
+            const bestDealsMap = suppliersData.reduce((acc, curr) => {
+                if (curr.licenses > 0) {
+                    if (!acc[curr.platform] || curr.price < acc[curr.platform].price) {
+                        acc[curr.platform] = curr;
+                    }
+                }
+                return acc;
+            }, {});
+
+            const deals = Object.values(bestDealsMap);
+
+            if (deals.length === 0) {
+                platformCards.innerHTML = `<p style="color:var(--text-muted);">No hay ofertas disponibles con stock.</p>`;
+                return;
+            }
+
+            platformCards.innerHTML = deals.map(deal => `
+                <div class="platform-card">
+                    <div class="best-badge">MEJOR PRECIO</div>
+                    <div class="platform-card-header">
+                        <span class="platform-name">${deal.platform}</span>
+                        <span class="platform-price">S/ ${deal.price.toFixed(2)}</span>
+                    </div>
+                    <div class="platform-details">
+                        <p>Página: <span>${deal.website}</span></p>
+                        <p>Proveedor: <span>${deal.provider}</span></p>
+                        <p>Licencias: <span>${deal.licenses} u.</span></p>
+                        <p>Actualizado: <span>${timeAgo(deal.updated)}</span></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTopProviders() {
+            const sortedTop = [...suppliersData]
+                .filter(item => item.licenses > 0)
+                .sort((a, b) => (a.price - b.price) || (b.licenses - a.licenses));
+
+            const top3 = sortedTop.slice(0, 3);
+
+            if (top3.length === 0) {
+                topProviders.innerHTML = `<p style="color:var(--text-muted);">Sin datos suficientes.</p>`;
+                return;
+            }
+
+            topProviders.innerHTML = top3.map((item, index) => `
+                <div class="top-item">
+                    <div class="top-rank rank-${index + 1}">${index + 1}</div>
+                    <div class="top-info">
+                        <h4>${item.platform} por S/ ${item.price.toFixed(2)}</h4>
+                        <p>${item.provider} (${item.website}) • ${item.licenses} uds</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTable(data) {
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = data.map(item => {
+                let badgeClass = 'badge-success';
+                let statusText = 'En Stock';
+
+                if (item.licenses === 0) {
+                    badgeClass = 'badge-danger';
+                    statusText = 'Agotado';
+                } else if (item.licenses < 15) {
+                    badgeClass = 'badge-warning';
+                    statusText = 'Poco Stock';
+                }
+
+                return `
+                    <tr>
+                        <td style="font-weight: 700;">${item.platform}</td>
+                        <td>${item.website}</td>
+                        <td>${item.provider}</td>
+                        <td style="color: var(--primary); font-weight: 700;">S/ ${item.price.toFixed(2)}</td>
+                        <td>${item.licenses}</td>
+                        <td>${timeAgo(item.updated)}</td>
+                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderManagementTable() {
+            const tbody = document.getElementById('management-table-body');
+            if (!tbody) return;
+
+            // Ordenar por actualización más reciente para que el último agregado salga primero
+            const sortedData = [...suppliersData].sort((a, b) => new Date(b.updated) - new Date(a.updated));
+
+            if (sortedData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay registros en el historial</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sortedData.map(item => `
+                <tr>
+                    <td style="color: var(--text-muted); font-size: 12px;">${item.id}</td>
+                    <td style="font-weight: 700;">${item.platform}</td>
+                    <td>${item.provider}</td>
+                    <td style="color: var(--primary); font-weight: 700;">S/ ${item.price.toFixed(2)}</td>
+                    <td>${item.licenses}</td>
+                    <td>
+                        <button class="btn-delete" data-id="${item.id}" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size: 18px;" title="Eliminar registro">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Evento para eliminar registros del historial
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const confirmacion = confirm("¿Deseas eliminar este registro de la lista?\\n\\n(Nota: Se borrará localmente. Ve a 'Ajustes > Sincronizar a Sheets' después para actualizar la nube).");
+                    if (confirmacion) {
+                        suppliersData = suppliersData.filter(item => item.id !== id);
+                        currentData = [...suppliersData];
+                        renderDashboard(); // Recalcula las estadísticas automáticamente
+                    }
+                });
+            });
+        }
+
+        function renderAdvancedStats() {
+            const totalInventoryValue = suppliersData.reduce((acc, item) => acc + (item.price * item.licenses), 0);
+            document.getElementById('adv-total-value').textContent = `S/ ${totalInventoryValue.toFixed(2)}`;
+
+            const avgPrice = suppliersData.length > 0 
+                ? (suppliersData.reduce((acc, item) => acc + item.price, 0) / suppliersData.length).toFixed(2) 
+                : 0;
+            document.getElementById('adv-avg-price').textContent = `S/ ${avgPrice}`;
+
+            const platformStats = {};
+            let maxLicenses = 0; 
+
+            suppliersData.forEach(item => {
+                if (!platformStats[item.platform]) platformStats[item.platform] = { licenses: 0, priceSum: 0, count: 0 };
+                platformStats[item.platform].licenses += item.licenses;
+                platformStats[item.platform].priceSum += item.price;
+                platformStats[item.platform].count += 1;
+            });
+
+            for (const plat in platformStats) {
+                if (platformStats[plat].licenses > maxLicenses) maxLicenses = platformStats[plat].licenses;
+            }
+
+            const barsHtml = Object.keys(platformStats)
+                .sort((a, b) => platformStats[b].licenses - platformStats[a].licenses)
+                .map(plat => {
+                    const stat = platformStats[plat];
+                    const percentage = maxLicenses === 0 ? 0 : (stat.licenses / maxLicenses) * 100;
+                    return `
+                        <div class="bar-item">
+                            <div class="bar-label"><span>${plat}</span><span>${stat.licenses} u.</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="width: ${percentage}%"></div></div>
+                        </div>
+                    `;
+                }).join('');
+            document.getElementById('adv-licenses-bars').innerHTML = barsHtml || '<p style="color:var(--text-muted)">No hay datos.</p>';
+
+            const pricesHtml = Object.keys(platformStats)
+                .sort((a, b) => a.localeCompare(b))
+                .map(plat => {
+                    const stat = platformStats[plat];
+                    const avgPlatformPrice = (stat.priceSum / stat.count).toFixed(2);
+                    return `
+                        <div class="list-item"><span>${plat}</span><span style="color: var(--primary);">S/ ${avgPlatformPrice}</span></div>
+                    `;
+                }).join('');
+            document.getElementById('adv-prices-list').innerHTML = pricesHtml || '<p style="color:var(--text-muted)">No hay datos.</p>';
+        }
+
+        // ================= FILTROS Y ORDENAMIENTO =================
+
+        function handleSearch(e) {
+            const term = e.target.value.toLowerCase();
+            currentData = suppliersData.filter(item => 
+                item.platform.toLowerCase().includes(term) ||
+                item.provider.toLowerCase().includes(term) ||
+                item.website.toLowerCase().includes(term)
+            );
+            handleSort(); 
+        }
+
+        function handleSort() {
+            const sortBy = sortSelect.value;
+            currentData.sort((a, b) => {
+                switch(sortBy) {
+                    case 'price-asc': return a.price - b.price;
+                    case 'licenses-desc': return b.licenses - a.licenses;
+                    case 'updated-desc': return new Date(b.updated) - new Date(a.updated);
+                    case 'platform-asc': return a.platform.localeCompare(b.platform);
+                    case 'provider-asc': return a.provider.localeCompare(b.provider);
+                    default: return 0;
+                }
+            });
+            renderTable(currentData);
+        }
+
+        // ================= UTILIDADES =================
+
+        function timeAgo(dateString) {
+            if (!dateString) return "Fecha desconocida";
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'hace unos segundos';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `hace ${minutes} min`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `hace ${hours} hr`;
+            const days = Math.floor(hours / 24);
+            if (days < 30) return `hace ${days} días`;
+            const months = Math.floor(days / 30);
+            if (months < 12) return `hace ${months} meses`;
+            return `hace ${Math.floor(months / 12)} años`;
+        }
+    </script>
+</body>
+</html>
